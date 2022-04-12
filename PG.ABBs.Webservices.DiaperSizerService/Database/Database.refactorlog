@@ -1,0 +1,52 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Operations Version="1.0" xmlns="http://schemas.microsoft.com/sqlserver/dac/Serialization/2012/02">
+  <Operation Name="Rename Refactor" Key="a5f61010-08be-44d1-95e3-cad13767e071" ChangeDateTime="10/08/2019 08:46:36">
+    <Property Name="ElementName" Value="[dbo].[DiaperFitFinder].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[DiaperFitFinder]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="DiaperFitFinderID" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="03949c2a-9827-4ca2-8711-6223e8b60d77" ChangeDateTime="10/08/2019 10:26:39">
+    <Property Name="ElementName" Value="[dbo].[MarketInfo].[MarketInfoId]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[MarketInfo]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="MarketInfoID" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="d51f4127-4fd6-4937-b339-7a080b3d80e0" ChangeDateTime="10/08/2019 10:30:13">
+    <Property Name="ElementName" Value="[dbo].[DiaperSize].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[DiaperSize]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="DiaperSizeID" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="f7500f4f-41c7-4a8c-94c1-ade6c1b083e3" ChangeDateTime="10/08/2019 10:38:11">
+    <Property Name="ElementName" Value="[dbo].[DiaperSizeAssociation].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[DiaperSizeAssociation]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="IdDiaperSizeAssociationID" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="d5ea12b2-089a-4370-a2af-8928877b4afc" ChangeDateTime="10/08/2019 10:38:23">
+    <Property Name="ElementName" Value="[dbo].[DiaperSizeAssociation].[IdDiaperSizeAssociationID]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[DiaperSizeAssociation]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="DiaperSizeAssociationID" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="57cf649b-b292-4038-9a26-96af0bbd008e" ChangeDateTime="10/09/2019 07:28:45">
+    <Property Name="ElementName" Value="[dbo].[DiaperFitFinders].[BabyWeightValue]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[DiaperFitFinders]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="c" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="5d8caa36-fb3d-40f0-964d-8bb399075198" ChangeDateTime="10/09/2019 07:29:13">
+    <Property Name="ElementName" Value="[dbo].[DiaperFitFinders].[c]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[DiaperFitFinders]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="BabyWeightValue" />
+  </Operation>
+</Operations>

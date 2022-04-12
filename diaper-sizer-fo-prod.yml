@@ -1,0 +1,181 @@
+# ASP.NET Core
+# Build and test ASP.NET Core projects targeting .NET Core.
+# Add steps that run tests, create a NuGet package, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
+
+trigger: none
+
+stages:
+
+  - stage: Build
+    jobs:
+    - job: Build
+      pool:
+        name: Azure Pipelines
+        vmImage: 'ubuntu-latest'
+      steps:
+      - powershell: '$env:CI="true"'
+        displayName: 'Set Environment Variables'
+      - task: Docker@2
+        displayName: Login to ACR
+        inputs:
+          containerRegistry: 'mbprodmicroservicesregistry'
+          command: 'login'
+      - task: PowerShell@2
+        displayName: Set sonarqube branch
+        inputs:
+          targetType: 'inline'
+          script: |
+            $branch = "$(Build.SourceBranch)"
+            $branchName = $branch.Substring($branch.IndexOf("/",$branch.IndexOf("/")+1)+1)
+            $dockerFile = Get-Content -Path .\Dockerfile
+            $sonarBranchPattern = "/d:sonar.branch.name=.*"
+            $sonarBranchName = $dockerFile | Select-String -Pattern $sonarBranchPattern
+            $updatedSonarBranch = $sonarBranchName.Matches.Value -replace "`"$", "-$branchName-Prod`""
+            Write-Host("Sonar branch: $updatedSonarBranch")
+            $dockerFile = $dockerFile -replace $sonarBranchPattern, $updatedSonarBranch
+            $dockerFile | Set-Content -Path .\Dockerfile
+      # - task: Docker@2
+      #   displayName: Docker Build and Push
+      #   inputs:
+      #     containerRegistry: 'mbprodmicroservicesregistry'
+      #     repository: 'diapersizer'
+      #     command: 'buildAndPush'
+      #     Dockerfile: 'Dockerfile'
+      #     tags: '$(Build.BuildNumber)'
+      - task: Docker@2
+        displayName: Docker Build
+        inputs:
+          containerRegistry: 'mbprodmicroservicesregistry'
+          repository: 'diapersizer'
+          command: 'build'
+          Dockerfile: 'Dockerfile'
+          tags: '$(Build.BuildNumber)'
+
+      - task: Docker@2
+        displayName: Docker Push
+        inputs:
+          containerRegistry: 'mbprodmicroservicesregistry'
+          repository: 'diapersizer'
+          command: 'push'
+          tags: '$(Build.BuildNumber)'
+
+      - task: CmdLine@2
+        displayName: Docker Pull from ACR
+        inputs:
+          script: 'docker pull mbprodmicroservicesregistry.azurecr.io/diapersizer:$(Build.BuildNumber)'
+
+      - task: Docker@2
+        displayName: Logout of ACR
+        inputs:
+          containerRegistry: 'mbprodmicroservicesregistry'
+          command: 'logout'
+
+      - task: CmdLine@2
+        displayName: Tag JFrog Image
+        inputs:
+          script: 'docker tag mbprodmicroservicesregistry.azurecr.io/diapersizer:$(Build.BuildNumber) png.jfrog.io/pamper-diapersizer-virtual/diapersizer:$(Build.BuildNumber)'
+
+      - task: ArtifactoryDocker@1 
+        displayName: Push to JFrog
+        inputs:
+          command: 'push'
+          artifactoryService: 'PX-JFrog-Artifactory-ServiceConnection'
+          targetRepo: 'pamper-diapersizer-virtual'
+          imageName: 'png.jfrog.io/pamper-diapersizer-virtual/diapersizer:$(Build.BuildNumber)'
+          collectBuildInfo: true
+          buildName: '$(Build.DefinitionName)'
+          buildNumber: '$(Build.BuildNumber)'
+          projectKey: 'pamper'
+          includeEnvVars: true
+      - task: ArtifactoryCollectIssues@1
+        displayName: Jfrog Collect Build Issues
+        inputs:
+          artifactoryService: 'PX-JFrog-Artifactory-ServiceConnection'
+          configSource: 'taskConfiguration'
+          taskConfig: |
+            version: 1
+            issues:
+                trackerName: ADO
+                regexp: (.+-[0-9]+)\s-\s(.+) 
+                keyGroupIndex: 1
+                summaryGroupIndex: 2
+                trackerUrl: https://dev.azure.com/pg-consumer/px-pampers-restage/_backlogs/backlog/pampers-general/Backlog%20items
+                aggregate: true
+                aggregationStatus: RELEASED
+          buildName: '$(Build.DefinitionName)'
+          buildNumber: '$(Build.BuildNumber)'
+          projectKey: 'pamper'
+
+      - task: ArtifactoryPublishBuildInfo@1
+        displayName: Jfrog Publish Build Issues
+        inputs:
+          artifactoryService: 'PX-JFrog-Artifactory-ServiceConnection'
+          buildName: '$(Build.DefinitionName)'
+          buildNumber: '$(Build.BuildNumber)'
+          projectKey: 'pamper'
+
+      - task: ArtifactoryXrayScan@1
+        displayName: JFrog XRay Scan
+        inputs:
+          artifactoryService: 'PX-JFrog-Artifactory-ServiceConnection'
+          buildName: '$(Build.DefinitionName)'
+          buildNumber: '$(Build.BuildNumber)'
+          projectKey: 'pamper'
+          allowFailBuild: false
+
+
+  - stage: Deploy
+    jobs:
+    - job: Deploy
+      pool:
+        name: Azure Pipelines
+        vmImage: 'ubuntu-latest'
+      steps:
+      - powershell: '$env:CI="true"'
+        displayName: 'Set Environment Variables'
+      - task: AzureWebAppContainer@1
+        displayName: 'Deploy to slot'
+        inputs:
+          azureSubscription: 'AZ-RG-CS-PX-MB-Services-PaaS-NA-01'
+          appName: 'mbproductiondiapersizer'
+          deployToSlotOrASE: true
+          resourceGroupName: AZ-RG-CS-PX-MB-Services-PaaS-NA-01
+          slotName: staging
+          containers: 'mbprodmicroservicesregistry.azurecr.io/diapersizer:$(Build.BuildNumber)'
+
+  - stage: SwapSlot
+    jobs:
+    - job: SwapSlot
+      pool:
+        name: Azure Pipelines
+        vmImage: 'ubuntu-latest'
+      steps:
+      - powershell: '$env:CI="true"'
+        displayName: 'Set Environment Variables'
+      - task: AzureAppServiceManage@0
+        displayName: 'Swap Slots: mbproductiondiapersizer'
+        inputs:
+          azureSubscription: 'AZ-RG-CS-PX-MB-Services-PaaS-NA-01'
+          WebAppName: 'mbproductiondiapersizer'
+          ResourceGroupName: 'AZ-RG-CS-PX-MB-Services-PaaS-NA-01'
+          SourceSlot: staging
+
+  - stage: Test
+    jobs:
+    - job: Test
+      pool:
+        name: Azure Pipelines
+        vmImage: 'ubuntu-latest'
+      steps:
+      - script: 'sudo npm install newman --global'
+        workingDirectory: '$(System.DefaultWorkingDirectory)'
+        displayName: 'Install newman'
+      - script: 'newman run MB_Microservice.postman_collection.json -e MB_Microservice_Prod.postman_environment.json --reporters cli,junit --reporter-junit-export Results/jUnitReport.xml'
+        workingDirectory: '$(System.DefaultWorkingDirectory)/_px-newman/QA'
+        displayName: 'Run API Test'
+        continueOnError: true
+      - task: PublishTestResults@2
+        displayName: 'Publish Test Results'
+        inputs:
+          testResultsFiles: '**/jUnitReport*.xml'
