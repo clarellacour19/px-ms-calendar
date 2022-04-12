@@ -47,7 +47,7 @@ stages:
       #   displayName: Docker Build and Push
       #   inputs:
       #     containerRegistry: 'mbnpmicroservicesregistry'
-      #     repository: 'diapersizer'
+      #     repository: 'calendarorganizer'
       #     command: 'buildAndPush'
       #     Dockerfile: 'Dockerfile'
       #     tags: '$(Build.BuildNumber)'
@@ -56,7 +56,7 @@ stages:
         displayName: Docker Build
         inputs:
           containerRegistry: 'mbnpmicroservicesregistry'
-          repository: 'diapersizer'
+          repository: 'calendarorganizer'
           command: 'build'
           Dockerfile: 'Dockerfile'
           tags: '$(Build.BuildNumber)'
@@ -65,14 +65,14 @@ stages:
         displayName: Docker Push
         inputs:
           containerRegistry: 'mbnpmicroservicesregistry'
-          repository: 'diapersizer'
+          repository: 'calendarorganizer'
           command: 'push'
           tags: '$(Build.BuildNumber)'
 
       - task: CmdLine@2
         displayName: Docker Pull from ACR
         inputs:
-          script: 'docker pull mbnpmicroservicesregistry.azurecr.io/diapersizer:$(Build.BuildNumber)'
+          script: 'docker pull mbnpmicroservicesregistry.azurecr.io/calendarorganizer:$(Build.BuildNumber)'
 
       - task: Docker@2
         displayName: Logout of ACR
@@ -83,15 +83,15 @@ stages:
       - task: CmdLine@2
         displayName: Tag JFrog Image
         inputs:
-          script: 'docker tag mbnpmicroservicesregistry.azurecr.io/diapersizer:$(Build.BuildNumber) png.jfrog.io/pamper-diapersizer-virtual/diapersizer:$(Build.BuildNumber)'
+          script: 'docker tag mbnpmicroservicesregistry.azurecr.io/calendarorganizer:$(Build.BuildNumber) png.jfrog.io/pamper-calendarorganizer-virtual/calendarorganizer:$(Build.BuildNumber)'
 
       - task: ArtifactoryDocker@1 
         displayName: Push to JFrog
         inputs:
           command: 'push'
           artifactoryService: 'PX-JFrog-Artifactory-ServiceConnection'
-          targetRepo: 'pamper-diapersizer-virtual'
-          imageName: 'png.jfrog.io/pamper-diapersizer-virtual/diapersizer:$(Build.BuildNumber)'
+          targetRepo: 'pamper-calendarorganizer-virtual'
+          imageName: 'png.jfrog.io/pamper-calendarorganizer-virtual/calendarorganizer:$(Build.BuildNumber)'
           collectBuildInfo: true
           buildName: '$(Build.DefinitionName)'
           buildNumber: '$(Build.BuildNumber)'
@@ -147,10 +147,10 @@ stages:
         displayName: 'Deploy to slot'
         inputs:
           azureSubscription: 'AZ-RG-CS-PX-MB-Services-PaaS-NA-NonProd-01'
-          appName: 'mbnpdiapersizer'
+          appName: 'px-calendar-nonprod'
           deployToSlotOrASE: true
           resourceGroupName: AZ-RG-CS-PX-MB-Services-PaaS-NA-NonProd-01
-          containers: 'mbnpmicroservicesregistry.azurecr.io/diapersizer:$(Build.BuildNumber)'
+          containers: 'mbnpmicroservicesregistry.azurecr.io/calendarorganizer:$(Build.BuildNumber)'
 
   - stage: Test
     jobs:
