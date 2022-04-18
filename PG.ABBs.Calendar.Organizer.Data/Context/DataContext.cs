@@ -29,7 +29,7 @@ namespace PG.ABBs.Calendar.Organizer.Data.Context
 
         #region DbSets
 
-        public DbSet<HreflangTagBinding> HreflangTagBindings { get; set; }
+      
         public DbSet<Events> Events { get; set; }
         public DbSet<Calendar> Calendars { get; set; }
         public DbSet<UserCalendar> UserCalendar { get; set; }
@@ -44,16 +44,16 @@ namespace PG.ABBs.Calendar.Organizer.Data.Context
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<HreflangTagBinding>(this.ConfigureHreflangTagBinding);
+            //modelBuilder.Entity<HreflangTagBinding>(this.ConfigureHreflangTagBinding);
             modelBuilder.Entity<Events>(this.ConfigureEvents);
             modelBuilder.Entity<Calendar>(this.ConfigureCalendar);
             modelBuilder.Entity<UserCalendar>(this.ConfigureUserCalendar);
         }
 
-        private void ConfigureHreflangTagBinding(EntityTypeBuilder<HreflangTagBinding> builder)
-        {
-            builder.ToTable("HreflangTagBinding");
-        }
+        //private void ConfigureHreflangTagBinding(EntityTypeBuilder<HreflangTagBinding> builder)
+        //{
+        //    builder.ToTable("HreflangTagBinding");
+        //}
 
         private void ConfigureEvents(EntityTypeBuilder<Events> builder)
         {
