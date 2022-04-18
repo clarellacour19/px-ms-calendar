@@ -33,6 +33,7 @@ namespace PG.ABBs.Calendar.Organizer.Data.Context
         public DbSet<Events> Events { get; set; }
         public DbSet<Calendar> Calendars { get; set; }
         public DbSet<UserCalendar> UserCalendar { get; set; }
+        public DbSet<GetCountInTable> GetCountInTable { get; set; }
 
         #endregion
 
@@ -48,6 +49,7 @@ namespace PG.ABBs.Calendar.Organizer.Data.Context
             modelBuilder.Entity<Events>(this.ConfigureEvents);
             modelBuilder.Entity<Calendar>(this.ConfigureCalendar);
             modelBuilder.Entity<UserCalendar>(this.ConfigureUserCalendar);
+            modelBuilder.Entity<GetCountInTable>(this.ConfigureGetCountInTable);
         }
 
         //private void ConfigureHreflangTagBinding(EntityTypeBuilder<HreflangTagBinding> builder)
@@ -68,6 +70,10 @@ namespace PG.ABBs.Calendar.Organizer.Data.Context
         private void ConfigureUserCalendar(EntityTypeBuilder<UserCalendar> builder)
         {
 	        builder.ToTable("UserCalendar");
+        }
+        private void ConfigureGetCountInTable(EntityTypeBuilder<GetCountInTable> builder)
+        {
+	        builder.ToTable("Results");
         }
 
         #endregion

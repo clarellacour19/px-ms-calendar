@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace PG.ABBs.Calendar.Organizer.Data.Models
 {
@@ -15,5 +16,11 @@ namespace PG.ABBs.Calendar.Organizer.Data.Models
 		public string DueDateHash { get; set; }
 		public string CalendarId { get; set; }
 		public string locale { get; set; }
+	}
+	[Keyless]
+	public class GetCountInTable
+	{	
+		
+		public int Count { get; set; }
 	}
 }

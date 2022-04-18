@@ -53,7 +53,7 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 			IOptions<List<string>> contentTypeSettings,
 			MarketSettingsHelper marketSettingsHelper,
 			StorageClient storageClient,
-			ILogger<HrefLangService> loggerProvider)
+			ILogger<CalendarService> loggerProvider)
 		{
 			this.unitOfWork = unitOfWork;
 			this.contentManager = contentManager;
@@ -136,14 +136,26 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 			{
 				var dueDateHash = OrganizerHelper.CreateMD5(dueDate);
 				var dueDateParsed = DateTime.Parse(dueDate);
+
+				//var argsGetCount = new Dictionary<string, object>
+				//{
+				//	{ "table", "Calendar" },
+				//	{ "locale", locale }
+				//};
+
+				//var getCalCount = this.unitOfWork.GetRepository<GetCountInTable>()
+				//	.ExecuteStoredProcedure(Constant.DatabaseObject.StoredProcedure.GetCountInTable, argsGetCount);
+
+
 				var argsToGetDueDateHash = new Dictionary<string, object>
 				{
 					{ "locale", locale },
 					{ "dueDateHash", dueDateHash },
-					{ "limit", null },
-					{ "sorting", null },
+					{ "limit", "" },
+					{ "sorting", "" },
 
 				};
+
 				var listOfCalendars = this.unitOfWork.GetRepository<Data.Models.Calendar>().ExecuteStoredProcedure(Constant.DatabaseObject.StoredProcedure.GetCalendars, argsToGetDueDateHash);//LOCALE
 				if (!listOfCalendars.Any())
 				{
@@ -168,9 +180,9 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 					//add user calender
 					var argsToAddUserCalender = new Dictionary<string, object>
 					{
-						{ "uuidHash", listOfCalendars.First().UuidHash },
+						{ "uuidHash", uuidHash },
 						{ "dueDateHash", listOfCalendars.First().DueDateHash },
-						{ "calenderId", listOfCalendars.First().CalenderId },
+						{ "calenderId", listOfCalendars.First().CalendarId },
 						{ "locale", listOfCalendars.First().Locale }
 
 					};
@@ -188,7 +200,7 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 			return errorList;
 		}
 
-		public object GetUserCalendar(GetUserCalendarDto Dto)
+		public Task<List<Data.Models.Calendar>> GetUserCalendar(GetUserCalendarDto Dto)
 		{
 			string site, locale, uuidHash, sorting = null;
 			int? limit;
@@ -220,7 +232,7 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 				};
 				var listOfCalendars = this.unitOfWork.GetRepository<Data.Models.Calendar>()
 					.ExecuteStoredProcedure(Constant.DatabaseObject.StoredProcedure.GetUserCalendars, argsToGetDueDateHash); //TO UPDATE
-				return listOfCalendars;
+				return (Task<List<Data.Models.Calendar>>)listOfCalendars;
 			}
 			catch (System.Exception e)
 			{
@@ -264,7 +276,7 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 							{ "contentId", events.ContentId }
 						};
 
-						this.unitOfWork.GetRepository<HreflangTagBinding>().ExecuteNonQueryStoredProcedure(Constant.DatabaseObject.StoredProcedure.DeleteEvent, argsToGet);
+						this.unitOfWork.GetRepository<Events>().ExecuteNonQueryStoredProcedure(Constant.DatabaseObject.StoredProcedure.DeleteEvent, argsToGet);
 						this.logger.LogInformation($"Batch deleted one obsolete event on DB : {events.ContentId}");
 					}
 					else
@@ -288,37 +300,54 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 				//new events not present in db
 				foreach (var calendarEvent in listOfCalendarEvents)
 				{
-					AddOrUpdateEvent<CalendarEvent>(calendarEvent);
+					calendarEvent.Locale = market.Language;
+					AddOrUpdateEvent<Events>(calendarEvent);
 					wasUpdated = true;
 				}
 
+				var argsGetCount = new Dictionary<string, object>
+				{
+					{ "table", "Calendar" },
+					{ "locale", market.Language }
+				};
 				var argsLocale = new Dictionary<string, object>
 				{
+					
 					{ "locale", market.Language }
 				};
 
 				TimeSpan span = DateTime.UtcNow.AddYears(market.DeleteTimeSpan) - DateTime.UtcNow;
 
-				var fullListOfCalendars = this.unitOfWork.GetRepository<Data.Models.Calendar>().ExecuteStoredProcedure(Constant.DatabaseObject.StoredProcedure.GetCalendars, argsLocale);//LOCALE
+				var getCalCount = this.unitOfWork.GetRepository<GetCountInTable>()
+					.ExecuteStoredProcedure(Constant.DatabaseObject.StoredProcedure.GetCountInTable, argsGetCount);
+				List<Data.Models.Calendar> fullListOfCalendars = null;
 
-				for (int i = 0; i < fullListOfCalendars.Count; i++)
+				if (getCalCount.First().Count > 0)
 				{
-					var calendar = fullListOfCalendars[i];
-					if (DateTime.UtcNow - calendar.DateCreated > span)
+					fullListOfCalendars = (List<Data.Models.Calendar>)this.unitOfWork.GetRepository<Data.Models.Calendar>().ExecuteStoredProcedure(Constant.DatabaseObject.StoredProcedure.GetAllCalendars, argsLocale);//LOCALE
+					for (int i = 0; i < fullListOfCalendars.Count; i++)
 					{
-						var argsDeleteCalendar = new Dictionary<string, object>
+						var calendar = fullListOfCalendars[i];
+						if (DateTime.UtcNow - calendar.DateCreated > span)
 						{
-							{ "dueDateHash", calendar.DueDateHash },
-							{ "locale", market.Language }
-						};
-						//delete
-						this.unitOfWork.GetRepository<HreflangTagBinding>().ExecuteNonQueryStoredProcedure(Constant.DatabaseObject.StoredProcedure.DeleteCalendar, argsDeleteCalendar);
-						this.storageClient.DeleteCalendar($"{calendar.DueDateHash}.ics");
-						this.logger.LogInformation($"Batch deleted one obsolete Calendar on DB and Azure storage: {calendar.DueDateHash}");
-						//remove
-						fullListOfCalendars.Remove(calendar);
+							var argsDeleteCalendar = new Dictionary<string, object>
+							{
+								{ "dueDateHash", calendar.DueDateHash },
+								{ "locale", market.Language }
+							};
+							//delete
+							this.unitOfWork.GetRepository<Data.Models.Calendar>().ExecuteNonQueryStoredProcedure(Constant.DatabaseObject.StoredProcedure.DeleteCalendar, argsDeleteCalendar);
+							this.storageClient.DeleteCalendar($"{calendar.DueDateHash}.ics");
+							this.logger.LogInformation($"Batch deleted one obsolete Calendar on DB and Azure storage: {calendar.DueDateHash}");
+							//remove
+							fullListOfCalendars.Remove(calendar);
+						}
 					}
 				}
+
+				//fullListOfCalendars = (List<Data.Models.Calendar>)this.unitOfWork.GetRepository<Data.Models.Calendar>().ExecuteStoredProcedure(Constant.DatabaseObject.StoredProcedure.GetAllCalendars, argsLocale);//LOCALE
+
+				
 
 				
 
@@ -334,27 +363,33 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 					//};
 
 					var listOfEvents = this.unitOfWork.GetRepository<Events>().ExecuteStoredProcedure(Constant.DatabaseObject.StoredProcedure.GetEvents, argsLocale);//LOCALE
-					var listOfCalendars = fullListOfCalendars;//this.unitOfWork.GetRepository<Data.Models.Calendar>().ExecuteStoredProcedure(Constant.DatabaseObject.StoredProcedure.GetCalendars, argsLocale);//LOCALE
-					foreach (var calendar in listOfCalendars)
+
+					if (!ReferenceEquals(fullListOfCalendars,null))
 					{
-						//GENERATE NEW CALENDER
-
-						var newCalender = GenerateCalender(calendar.DueDate, market.Language);
-						this.storageClient.DeleteCalendar(newCalender.Name);
-						this.storageClient.UploadCalendar(newCalender);
-
-						//update db
-
-						AddOrUpdateCalendar<Data.Models.Calendar>(new Data.Models.Calendar()
+						var listOfCalendars = fullListOfCalendars;//this.unitOfWork.GetRepository<Data.Models.Calendar>().ExecuteStoredProcedure(Constant.DatabaseObject.StoredProcedure.GetCalendars, argsLocale);//LOCALE
+						foreach (var calendar in listOfCalendars)
 						{
-							UuidHash = calendar.UuidHash,
-							DueDate = calendar.DueDate,
-							DueDateHash = calendar.DueDateHash,
-							DateCreated = DateTime.UtcNow,
-							Locale = market.Language
-						});
+							//GENERATE NEW CALENDER
 
+							var newCalender = GenerateCalender(calendar.DueDate, market.Language);
+							this.storageClient.DeleteCalendar(newCalender.Name);
+							this.storageClient.UploadCalendar(newCalender);
+
+							//update db
+
+							AddOrUpdateCalendar<Data.Models.Calendar>(new Data.Models.Calendar()
+							{
+								UuidHash = calendar.UuidHash,
+								DueDate = calendar.DueDate,
+								DueDateHash = calendar.DueDateHash,
+								DateCreated = DateTime.UtcNow,
+								Locale = market.Language
+							});
+
+						}
 					}
+
+					
 
 				}
 
@@ -374,7 +409,7 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 			{
 
 				{ "contentId", obj.Sys.Id },
-				{ "lastUpdated", DateTime.UtcNow },
+				{ "lastCreated", DateTime.UtcNow },
 				{ "title", obj.Title },
 				{ "description", obj.Description },
 				{ "period", obj.Period },
@@ -392,7 +427,7 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 			var argsToGet = new Dictionary<string, object>
 			{
 
-				{ "calendarId", obj.CalenderId },
+				
 				{ "UuidHash", obj.UuidHash },
 				{ "dueDate", obj.DueDate },
 				{ "dueDateHash", obj.DueDateHash },

@@ -31,7 +31,9 @@ namespace PG.ABBs.Calendar.Organizer.Data.Constant
             {
 	            public const string GetEvents = "GetEvents";
 	            public const string GetCalendars = "GetCalendars";
+	            public const string GetAllCalendars = "GetAllCalendars";
 	            public const string GetUserCalendars = "GetUserCalendars";
+	            public const string GetCountInTable = "GetCountInTable";
 
 	            public const string AddOrUpdateEvents = "AddOrUpdateEvents";
 	            public const string AddOrUpdateCalendars = "AddOrUpdateCalendars";
