@@ -1,9 +1,15 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using PG.ABBs.Calendar.Organizer.Service.Dto;
 using PG.ABBs.Calendar.Organizer.Service.Services;
 
 namespace PG.ABBs.Calendar.Organizer.API.Controllers
-{
+{	/// </summary>
+	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+	[Route("api/[controller]")]
+	[Produces("application/json")]
+	[ApiController]
 	public class CalendarController : Controller
 	{
 		private readonly ICalendarService calendarService;

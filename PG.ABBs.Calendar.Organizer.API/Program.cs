@@ -48,9 +48,9 @@ services.AddSwaggerGen(
 					"The HrefLang Microservice HTTP API. This is all microservice API endpoints"
 			});
 
-		var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-		var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-		options.IncludeXmlComments(xmlPath);
+		//var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+		//var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+		//options.IncludeXmlComments(xmlPath);
 	});
 
 services.AddCors(

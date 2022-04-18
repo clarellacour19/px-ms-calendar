@@ -91,7 +91,7 @@ namespace PG.ABBs.Calendar.Organizer.Service.Dependency
             
             services.AddScoped(typeof(IDataRepository<>), typeof(DatabaseRepository<>));
             services.AddScoped<IUnitOfWork<DataContext>, UnitOfWork<DataContext>>();
-            services.AddScoped<IHrefLangService, HrefLangService>();
+            services.AddScoped<ICalendarService, CalendarService>();
 
             services.Configure<ContentProviderSettings>(configuration.GetSection(ContentProviderSettings.SectionName));
             services.AddScoped(config => config.GetService<IOptionsSnapshot<ContentProviderSettings>>().Value);
