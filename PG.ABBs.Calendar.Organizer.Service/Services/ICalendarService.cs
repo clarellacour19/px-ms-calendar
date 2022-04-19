@@ -11,7 +11,7 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 	{
 		Task<Object> BatchUpdateCalendar(BatchUpdateCalendarDto Dto);
 
-		Task<List<Data.Models.Calendar>> GetUserCalendar(GetUserCalendarDto Dto);
+		ReturnGetUserCalendarDto GetUserCalendar(GetUserCalendarDto Dto);
 
 		Object GenerateCalendar(GenerateCalendarDto Dto);
 	}

@@ -200,7 +200,7 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 			return errorList;
 		}
 
-		public Task<List<Data.Models.Calendar>> GetUserCalendar(GetUserCalendarDto Dto)
+		public ReturnGetUserCalendarDto GetUserCalendar(GetUserCalendarDto Dto)
 		{
 			string site, locale, uuidHash, sorting = null;
 			int? limit;
@@ -231,8 +231,13 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 
 				};
 				var listOfCalendars = this.unitOfWork.GetRepository<Data.Models.Calendar>()
-					.ExecuteStoredProcedure(Constant.DatabaseObject.StoredProcedure.GetUserCalendars, argsToGetDueDateHash); //TO UPDATE
-				return (Task<List<Data.Models.Calendar>>)listOfCalendars;
+					.ExecuteStoredProcedure(Constant.DatabaseObject.StoredProcedure.GetUserCalendars, argsToGetDueDateHash).ToList(); //TO UPDATE
+				var returnGetUserCalendarDto = new ReturnGetUserCalendarDto
+				{
+					Calendar = listOfCalendars
+				};
+
+				return returnGetUserCalendarDto;
 			}
 			catch (System.Exception e)
 			{

@@ -35,7 +35,7 @@ namespace PG.ABBs.Calendar.Organizer.AzureStorage
 			string serializedCalendar = iCalSerializer.SerializeToString(CalendarName);
 			var bytesCalendar = Encoding.ASCII.GetBytes(serializedCalendar);
 
-			var blockBlob = container.GetBlobClient(CalendarName.Name);
+			var blockBlob = container.GetBlobClient(CalendarName.Name+".ics");
 
 			using (MemoryStream memoryStream = new MemoryStream(bytesCalendar))
 			{

@@ -93,6 +93,6 @@ namespace PG.ABBs.Calendar.Organizer.API
 
         #endregion
 
-        public List<Data.Models.Calendar>  GetUserCalendar { get; set; }
+        
     }
 }
