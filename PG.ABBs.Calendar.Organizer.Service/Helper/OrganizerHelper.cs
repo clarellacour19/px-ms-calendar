@@ -36,9 +36,12 @@ namespace PG.ABBs.Calendar.Organizer.Service.Helper
         {
             items = new List<Item>()
         };
-	    
 
-       
+
+        public static Dictionary<string, object> StoredProcArgument(Dictionary<string, object> dict)
+        {
+	        return dict;
+        }
 
         public static string CreateMD5(string input)
         {

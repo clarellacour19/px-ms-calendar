@@ -34,10 +34,7 @@ namespace PG.ABBs.Calendar.Organizer.Service.Dependency
 
         public void Register(IServiceCollection services, IConfiguration configuration, bool isDevelopment)
         {
-            //services.Configure<CiamProviders>(configuration.GetSection("CiamProviders"));
 
-            //services.AddScoped(config => config.GetService<IOptionsSnapshot<DatabaseSettings>>().Value);
-            //services.AddScoped(config => config.GetService<IOptionsSnapshot<CiamProviders>>().Value);
 
             services.Configure<SharedMarketSettings>(configuration.GetSection(SharedMarketSettings.SectionName));
 
@@ -96,9 +93,7 @@ namespace PG.ABBs.Calendar.Organizer.Service.Dependency
             services.Configure<ContentProviderSettings>(configuration.GetSection(ContentProviderSettings.SectionName));
             services.AddScoped(config => config.GetService<IOptionsSnapshot<ContentProviderSettings>>().Value);
 
-            //services.Configure<List<string>>(configuration.GetSection(ContentSettings.GpocContentTypeSectionName));
-            // services.Configure<ContentSettings>(configuration.GetSection(ContentSettings.SectionName));
-            // services.AddScoped(config => config.GetService<IOptionsSnapshot<ContentSettings>>().Value);
+
             services.AddScoped<IContentRepository, DefaultRepository>();
             services.AddScoped<IRetryPolicy, RetryPolicyService>();
             services.AddTransient<ClientFactory>();

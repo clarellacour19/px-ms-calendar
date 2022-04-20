@@ -71,12 +71,8 @@ namespace PG.ABBs.Calendar.Organizer.API.Controllers
 			var apiResponse = new ApiResponse();
 			try
 			{
-				//Response.OnCompleted(async () =>
-				//{
-				//	this.calendarService.GetUserCalendar(Dto);
-				//});
-				//apiResponse.UpdateResult(Constants.ErrorCodes.Ok, null);
-				var fromObject = this.calendarService.GetUserCalendar(Dto);//use a dto
+				
+				var fromObject = this.calendarService.GetUserCalendar(Dto);
 				apiResponse.UpdateResult(Constants.ErrorCodes.Ok, fromObject);
 
 			}

@@ -50,7 +50,7 @@ namespace PG.ABBs.Calendar.Organizer.AzureStorage
 			{
 				if (!CalendarName.Equals(null))
 				{
-					var blob = container.GetBlobClient(CalendarName);
+					var blob = container.GetBlobClient(CalendarName+".ics");
 					if (blob.ExistsAsync().Result)
 					{
 						blob.DeleteAsync();
