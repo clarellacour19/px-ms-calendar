@@ -33,15 +33,13 @@ namespace PG.ABBs.Calendar.Organizer.Data.Constant
 	            public const string GetCalendars = "GetCalendars";
 	            public const string GetAllCalendars = "GetAllCalendars";
 	            public const string GetUserCalendars = "GetUserCalendars";
-	            public const string GetCountInTable = "GetCountInTable";
+	           
 
 	            public const string AddOrUpdateEvents = "AddOrUpdateEvents";
 	            public const string AddOrUpdateCalendars = "AddOrUpdateCalendars";
 	            public const string AddOrUpdateUserCalendar = "AddOrUpdateUserCalendar";
 
-                public const string GetRestageHreflangTagBinding = "GetRestageHreflangTagBinding";
-
-                public const string DeleteEntryHreflangTagBinding = "DeleteEntryHreflangTagBinding";
+                
                 public const string DeleteEvent = "DeleteEvent";
                 public const string DeleteCalendar = "DeleteCalendar";
 

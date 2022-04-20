@@ -29,28 +29,37 @@ namespace PG.ABBs.Calendar.Organizer.AzureStorage
 
 		}
 
-		public void UploadCalendar(Ical.Net.Calendar CalendarName)
+		public void UploadCalendar(Ical.Net.Calendar CalendarName,string market)
 		{
-			var iCalSerializer = new CalendarSerializer();
-			string serializedCalendar = iCalSerializer.SerializeToString(CalendarName);
-			var bytesCalendar = Encoding.ASCII.GetBytes(serializedCalendar);
-
-			var blockBlob = container.GetBlobClient(CalendarName.Name+".ics");
-
-			using (MemoryStream memoryStream = new MemoryStream(bytesCalendar))
+			try
 			{
-				blockBlob.UploadAsync(memoryStream);
+				var iCalSerializer = new CalendarSerializer();
+				string serializedCalendar = iCalSerializer.SerializeToString(CalendarName);
+				var bytesCalendar = Encoding.ASCII.GetBytes(serializedCalendar);
+
+				var blockBlob = container.GetBlobClient(Path.Combine($"{market}/{CalendarName.Name}.ics"));
+
+				using (MemoryStream memoryStream = new MemoryStream(bytesCalendar))
+				{
+					blockBlob.UploadAsync(memoryStream);
+				}
 			}
+			catch (Exception e)
+			{
+				Console.WriteLine(e);
+				throw;
+			}
+			
 
 		}
 
-		public void DeleteCalendar(string CalendarName)
+		public void DeleteCalendar(string CalendarName,string market)
 		{
 			try
 			{
 				if (!CalendarName.Equals(null))
 				{
-					var blob = container.GetBlobClient(CalendarName+".ics");
+					var blob = container.GetBlobClient($"{market}/{CalendarName}.ics");
 					if (blob.ExistsAsync().Result)
 					{
 						blob.DeleteAsync();

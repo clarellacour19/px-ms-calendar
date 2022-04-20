@@ -82,13 +82,30 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 			try
 			{
 				var repository = this.contentManager.GetRepository();
-				//use threading Parallel
-				Parallel.ForEach(marketSettings.Value, market =>
-				{	
+				
 
-					errorList.AddRange(ProcessBatch(market, repository)?.Result);
+				if (ReferenceEquals(locale, null))
+				{
+					//use threading Parallel	
+					Parallel.ForEach(marketSettings.Value, market =>
+					{
 
-				});
+						errorList.AddRange(ProcessBatch(market, repository)?.Result);
+
+					});
+				}
+				else
+				{
+					var market = marketSettings.Value.Where(m => m.Language.Equals(locale));
+
+					if (!ReferenceEquals(market.First(), null))
+					{
+						errorList.AddRange(ProcessBatch(market.First(), repository)?.Result);
+					}
+
+				}
+
+				
 
 
 			}
@@ -121,8 +138,9 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 			var errorList = new List<String>();
 			string site, locale, uuidHash, dueDate = null;
 			if (ReferenceEquals(Dto, null))
-			{	
+			{
 				//TODO: add logger
+				this.logger.LogWarning($"GenerateCalendar DTO is empty- No Calendars generated");
 				return null;
 			}
 			else
@@ -135,7 +153,7 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 
 			try
 			{
-				var dueDateHash = OrganizerHelper.CreateMD5(dueDate);
+				var dueDateHash = OrganizerHelper.CreateMD5(dueDate.ToString());
 				var dueDateParsed = DateTime.Parse(dueDate);
 
 				//var argsGetCount = new Dictionary<string, object>
@@ -161,9 +179,9 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 				if (!listOfCalendars.Any())
 				{
 					//generate new calender amd upload to storage
-					var calendar = GenerateCalender(dueDateParsed, locale);
+					var calendar = GenerateCalender(dueDateParsed, locale, dueDateHash);
 
-					this.storageClient.UploadCalendar(calendar);
+					this.storageClient.UploadCalendar(calendar,locale);
 
 					//add to db
 					
@@ -194,7 +212,7 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 			}
 			catch (System.Exception ex)
 			{
-				Console.WriteLine(ex);//TODO: add logger
+				this.logger.LogError($"Error during  generate calendar: {DateTime.UtcNow} - {ex.Message} - {ex.StackTrace}");
 				errorList.Add($"Error during generate calendar: {ex.Message} - {DateTime.UtcNow}");
 			}
 			
@@ -209,6 +227,7 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 			if (ReferenceEquals(Dto, null))
 			{
 				//TODO: add logger
+				this.logger.LogWarning($"GetUserCalendar DTO is empty- No Calendars retrieved");
 				return null;
 			}
 			else
@@ -240,9 +259,9 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 
 				return returnGetUserCalendarDto;
 			}
-			catch (System.Exception e)
+			catch (System.Exception ex)
 			{
-				Console.WriteLine(e);
+				this.logger.LogError($"Error during GetUserCalendar: {DateTime.UtcNow} - {ex.Message} - {ex.StackTrace}");
 				throw;
 			}
 		}
@@ -328,8 +347,8 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 				for (int i = 0; i < fullListOfCalendars.Count; i++)
 				{
 					var calendar = fullListOfCalendars[i];
-					//if (DateTime.UtcNow - calendar.DateCreated > span)
-					if (true)
+					if (DateTime.UtcNow - calendar.DateCreated > span)
+					//if (true)
 					{
 						var argsDeleteCalendar = new Dictionary<string, object>
 						{
@@ -338,7 +357,7 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 						};
 						//delete
 						this.unitOfWork.GetRepository<Data.Models.Calendar>().ExecuteNonQueryStoredProcedure(Constant.DatabaseObject.StoredProcedure.DeleteCalendar, argsDeleteCalendar);
-						this.storageClient.DeleteCalendar($"{calendar.DueDateHash}");
+						this.storageClient.DeleteCalendar($"{calendar.DueDateHash}", market.Language);
 						this.logger.LogInformation($"Batch deleted one obsolete Calendar on DB and Azure storage: {calendar.DueDateHash}");
 						//remove
 						fullListOfCalendars.Remove(calendar);
@@ -372,9 +391,9 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 						{
 							//GENERATE NEW CALENDER
 
-							var newCalender = GenerateCalender(calendar.DueDate, market.Language);
-							this.storageClient.DeleteCalendar(newCalender.Name);
-							this.storageClient.UploadCalendar(newCalender);							
+							var newCalender = GenerateCalender(calendar.DueDate, market.Language, calendar.DueDateHash);
+							this.storageClient.DeleteCalendar(newCalender.Name,market.Language);
+							this.storageClient.UploadCalendar(newCalender,market.Language);							
 							//update db
 
 							AddOrUpdateCalendar<Data.Models.Calendar>(new Data.Models.Calendar()
@@ -441,12 +460,12 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 			this.unitOfWork.GetRepository<T>().ExecuteNonQueryStoredProcedure(Constant.DatabaseObject.StoredProcedure.AddOrUpdateCalendars, argsToGet);
 		}
 
-		public Ical.Net.Calendar GenerateCalender(DateTime dueDate, string locale)
+		public Ical.Net.Calendar GenerateCalender(DateTime dueDate, string locale,string dueDateHash)
 		{
 			//new calender initilized
 			var calendar = new Ical.Net.Calendar()
 			{
-				Name = OrganizerHelper.CreateMD5(dueDate.ToString())
+				Name = dueDateHash//OrganizerHelper.CreateMD5(dueDate.ToString())
 			};
 
 			
