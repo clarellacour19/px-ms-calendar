@@ -156,14 +156,6 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 				var dueDateHash = OrganizerHelper.CreateMD5(dueDate.ToString());
 				var dueDateParsed = DateTime.Parse(dueDate);
 
-				//var argsGetCount = new Dictionary<string, object>
-				//{
-				//	{ "table", "Calendar" },
-				//	{ "locale", locale }
-				//};
-
-				//var getCalCount = this.unitOfWork.GetRepository<GetCountInTable>()
-				//	.ExecuteStoredProcedure(Constant.DatabaseObject.StoredProcedure.GetCountInTable, argsGetCount);
 
 
 				var argsToGetDueDateHash = new Dictionary<string, object>
@@ -329,18 +321,12 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 					wasUpdated = true;
 				}
 
-				//var argsGetCount = new Dictionary<string, object>
-				//{
-				//	{ "table", "Calendar" },
-				//	{ "locale", market.Language }
-				//};
+			
 				
 
 				TimeSpan span = DateTime.UtcNow.AddYears(market.DeleteTimeSpan) - DateTime.UtcNow;
 
-				//var getCalCount = this.unitOfWork.GetRepository<GetCountInTable>()
-				//	.ExecuteStoredProcedure(Constant.DatabaseObject.StoredProcedure.GetCountInTable, argsGetCount);
-				//List<Data.Models.Calendar> fullListOfCalendars = null;
+				
 
 				
 				var fullListOfCalendars =this.unitOfWork.GetRepository<Data.Models.Calendar>().ExecuteStoredProcedure(Constant.DatabaseObject.StoredProcedure.GetAllCalendars, argsLocale).ToList();//LOCALE
@@ -365,8 +351,6 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 				}
 				
 
-				//fullListOfCalendars = (List<Data.Models.Calendar>)this.unitOfWork.GetRepository<Data.Models.Calendar>().ExecuteStoredProcedure(Constant.DatabaseObject.StoredProcedure.GetAllCalendars, argsLocale);//LOCALE
-
 				
 
 				
@@ -377,16 +361,12 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 					//get all calendar
 					// run process to generate new ICS
 
-					//var argsLocale = new Dictionary<string, object>
-					//{
-					//	{ "locale", market.Language }
-					//};
 
 					var listOfEvents = this.unitOfWork.GetRepository<Events>().ExecuteStoredProcedure(Constant.DatabaseObject.StoredProcedure.GetEvents, argsLocale);//LOCALE
 
 					if (!ReferenceEquals(fullListOfCalendars,null))
 					{
-						var listOfCalendars = fullListOfCalendars;//this.unitOfWork.GetRepository<Data.Models.Calendar>().ExecuteStoredProcedure(Constant.DatabaseObject.StoredProcedure.GetCalendars, argsLocale);//LOCALE
+						var listOfCalendars = fullListOfCalendars;
 						foreach (var calendar in listOfCalendars)
 						{
 							//GENERATE NEW CALENDER
@@ -465,7 +445,7 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 			//new calender initilized
 			var calendar = new Ical.Net.Calendar()
 			{
-				Name = dueDateHash//OrganizerHelper.CreateMD5(dueDate.ToString())
+				Name = dueDateHash
 			};
 
 			

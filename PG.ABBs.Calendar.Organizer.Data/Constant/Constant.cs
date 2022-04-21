@@ -16,6 +16,7 @@ namespace PG.ABBs.Calendar.Organizer.Data.Constant
         public const string ConnectionString = "DatabaseSettings:ConnectionString";
 
         public const string KeyVaultConnectionString = "DatabaseSettings-ConnectionString";
+        public const string KeyVaultStorageConnectionString = "Azurestorage-ConnectionString";
 
         public const string KeyVaultDeliveryApiKey = "Contentful-DeliveryApiKey";
         public const string KeyVaultPreviewApiKey = "Contentful-PreviewApiKey";

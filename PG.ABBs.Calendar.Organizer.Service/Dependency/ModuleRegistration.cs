@@ -65,19 +65,13 @@ namespace PG.ABBs.Calendar.Organizer.Service.Dependency
                     }
                 });
 
-                services.PostConfigure<SharedMarketSettings>(settings =>
-                {
-                    settings.DeliveryApiKey = configuration[$"{Constant.KeyVaultDeliveryApiKey}-{settings.SpaceId}"];
-                    settings.PreviewApiKey = configuration[$"{Constant.KeyVaultPreviewApiKey}-{settings.SpaceId}"];
-                    settings.ManagementApiKey = configuration[$"{Constant.KeyVaultManagementApiKey}"];
 
-                    if(string.IsNullOrEmpty(settings.DeliveryApiKey) || string.IsNullOrEmpty(settings.PreviewApiKey))
-                    {
-                        settings.DeliveryApiKey = configuration[$"SharedMarket:DeliveryApiKey"];
-                        settings.PreviewApiKey = configuration[$"SharedMarket:PreviewApiKey"];
-                        settings.ManagementApiKey = configuration[$"{Constant.KeyVaultManagementApiKey}"];
-                    }
+                services.PostConfigure<StorageModel>(model =>
+                {
+	                model.ConnectionString = configuration[Constant.KeyVaultStorageConnectionString];
                 });
+
+
 
             }
             else
