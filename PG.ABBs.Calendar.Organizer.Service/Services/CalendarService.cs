@@ -105,9 +105,6 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 
 				}
 
-				
-
-
 			}
 			catch (System.Exception ex)
 			{
@@ -218,7 +215,6 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 
 			if (ReferenceEquals(Dto, null))
 			{
-				//TODO: add logger
 				this.logger.LogWarning($"GetUserCalendar DTO is empty- No Calendars retrieved");
 				return null;
 			}
@@ -268,13 +264,7 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 
 			try
 			{
-				//get domain name as well 
-				var siteSettings =
-					(await repository.GetAll<SiteSettingsContent>(market.Language, ContentSettings.SiteSetting))
-					.ToList();
-				var domainUrl = siteSettings.Any()
-					? siteSettings[0].Domain
-					: string.Empty;
+				
 				var listOfCalendarEvents = (await repository.GetAll<CalendarEvent>(market.Language, ContentSettings.CalendarEvent))
 					.ToList();
 
@@ -334,7 +324,6 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 				{
 					var calendar = fullListOfCalendars[i];
 					if (DateTime.UtcNow - calendar.DateCreated > span)
-					//if (true)
 					{
 						var argsDeleteCalendar = new Dictionary<string, object>
 						{
@@ -351,18 +340,12 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 				}
 				
 
-				
-
-				
-
-				/////
 				if (wasUpdated)
 				{
 					//get all calendar
 					// run process to generate new ICS
 
-
-					var listOfEvents = this.unitOfWork.GetRepository<Events>().ExecuteStoredProcedure(Constant.DatabaseObject.StoredProcedure.GetEvents, argsLocale);//LOCALE
+					//var listOfEvents = this.unitOfWork.GetRepository<Events>().ExecuteStoredProcedure(Constant.DatabaseObject.StoredProcedure.GetEvents, argsLocale);//LOCALE
 
 					if (!ReferenceEquals(fullListOfCalendars,null))
 					{
