@@ -20,14 +20,7 @@ namespace PG.ABBs.Calendar.Organizer.API
 
         #endregion
 
-        #region Public Methods and Operators
-
-        public static string GetFormCacheKey(string formId, string userToken, string local)
-        {
-            return $"GetForm_{formId}_{userToken}_{local}";
-        }
-
-        #endregion
+        
 
         public struct ErrorCodes
         {
@@ -48,59 +41,12 @@ namespace PG.ABBs.Calendar.Organizer.API
             #endregion
         }
 
-        public struct JanrainService
-        {
-            #region  Access token And Refresh token
+       
 
-            public const string Code = "code";
+        
+        
 
-            public const string RefreshToken = "refresh_token";
-
-            #endregion
-        }
-
-        public struct ProcedureName
-        {
-            #region Constants
-
-            public const string GetForm = "GETFORM";
-
-            public const string GetErrorByLocaleAndKeyAndDefault = "GetErrorByLocaleAndKeyAndDefault";
-
-            public const string GetSocialRegistrationForm = "GetSocialRegistrationForm";
-
-            #endregion
-        }
-
-        public struct ProcedureParameterName
-        {
-
-            public const string FormId = "FormId";
-
-            public const string FormType = "FormType";
-
-            public const string Local = "Formlocal";
-
-            public const string ErrorLocale = "Local";
-
-            public const string ErrorKey = "ErrorKey";
-
-            public const string ErrorDefaultMessage = "DefaultValue";
-
-            public const string Culture = "culture";
-        }
-
-        private static readonly Guid SocialRegistrationTypeId = new Guid("B3B7B580-9FB5-45DF-9913-19DE0FC45713");
-
-        public static string GetFormCacheKey(string formId, string local)
-        {
-            return $"GetForm_{formId}_{local}";
-        }
-
-        public static Guid SocialRegistrationFormId()
-        {
-            return SocialRegistrationTypeId;
-        }
+        
 
         public const string Authority = "JwtSettings:Authority";
         public const string Audience = "JwtSettings:Audience";

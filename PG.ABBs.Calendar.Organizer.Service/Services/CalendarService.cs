@@ -65,7 +65,7 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 			this.logger = loggerProvider;
 		}
 
-		public async Task<object> BatchUpdateCalendar(BatchUpdateCalendarDto Dto)
+		public async Task<List<string>> BatchUpdateCalendar(BatchUpdateCalendarDto Dto)
 		{
 			string site, locale = null;
 			if (!ReferenceEquals(Dto, null))
@@ -119,24 +119,25 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 
 			var time = endTime.Subtract(beginTime);
 
-			var result = new
+			
+
+			var result = new List<string>
 			{
-				BeginTime = beginTime,
-				EndTime = endTime,
-				ProcessTimeTook = $"{time.Hours}h:{time.Minutes}mm:{time.Seconds}s:{time.Milliseconds}ms",
-				Errors = errorList
+				$"BeginTime: {beginTime}",
+				$"EndTime: {endTime}",
+				$"ProcessTimeTook:"+$"{time.Hours}h:{time.Minutes}mm:{time.Seconds}s:{time.Milliseconds}ms",
+				$"Errors: {errorList}",
 			};
 
 			return result;
 		}
 
-		public object GenerateCalendar(GenerateCalendarDto Dto)
+		public List<string> GenerateCalendar(GenerateCalendarDto Dto)
 		{
 			var errorList = new List<String>();
 			string site, locale, uuidHash, dueDate = null;
 			if (ReferenceEquals(Dto, null))
 			{
-				//TODO: add logger
 				this.logger.LogWarning($"GenerateCalendar DTO is empty- No Calendars generated");
 				return null;
 			}
@@ -151,8 +152,8 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 			try
 			{
 				var dueDateHash = OrganizerHelper.CreateMD5(dueDate.ToString());
-				var dueDateParsed = DateTime.Parse(dueDate);
-
+				var dueDateParsed = new DateTime();
+				DateTime.TryParse(dueDate, out dueDateParsed);
 
 
 				var argsToGetDueDateHash = new Dictionary<string, object>
@@ -201,8 +202,8 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 			}
 			catch (System.Exception ex)
 			{
-				this.logger.LogError($"Error during  generate calendar: {DateTime.UtcNow} - {ex.Message} - {ex.StackTrace}");
-				errorList.Add($"Error during generate calendar: {ex.Message} - {DateTime.UtcNow}");
+				this.logger.LogError($"Error during  generate calendar: {DateTime.UtcNow} - {ex.Message} - {ex.StackTrace} for market {locale}");
+				errorList.Add($"Error during generate calendar: {ex.Message} - {DateTime.UtcNow} for market {locale}");
 			}
 			
 			return errorList;
@@ -257,7 +258,7 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 		protected async Task<List<string>> ProcessBatch(MarketSettings market, IContentRepository repository)
 		{
 
-			this.logger.LogWarning($"Update Calendar Batch running for : {market.Language}");
+			this.logger.LogWarning($"Update Calendar Batch Started for : {market.Language} at {DateTime.UtcNow}");
 
 			var errorList = new List<string>();
 			var wasUpdated = false;
@@ -287,7 +288,7 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 						};
 
 						this.unitOfWork.GetRepository<Events>().ExecuteNonQueryStoredProcedure(Constant.DatabaseObject.StoredProcedure.DeleteEvent, argsToGet);
-						this.logger.LogInformation($"Batch deleted one obsolete event on DB : {events.ContentId}");
+						this.logger.LogInformation($"Batch deleted one obsolete event on DB : {events.ContentId} for market {market.Language}");
 					}
 					else
 					{
@@ -314,7 +315,7 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 			
 				
 
-				TimeSpan span = DateTime.UtcNow.AddYears(market.DeleteTimeSpan) - DateTime.UtcNow;
+				TimeSpan span = DateTime.UtcNow.AddMonths(market.DeleteTimeSpan) - DateTime.UtcNow;
 
 				
 
@@ -333,7 +334,7 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 						//delete
 						this.unitOfWork.GetRepository<Data.Models.Calendar>().ExecuteNonQueryStoredProcedure(Constant.DatabaseObject.StoredProcedure.DeleteCalendar, argsDeleteCalendar);
 						this.storageClient.DeleteCalendar($"{calendar.DueDateHash}", market.Language);
-						this.logger.LogInformation($"Batch deleted one obsolete Calendar on DB and Azure storage: {calendar.DueDateHash}");
+						this.logger.LogInformation($"Batch deleted one obsolete Calendar on DB and Azure storage: {calendar.DueDateHash} for market {market.Language}");
 						//remove
 						fullListOfCalendars.Remove(calendar);
 					}
@@ -345,7 +346,6 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 					//get all calendar
 					// run process to generate new ICS
 
-					//var listOfEvents = this.unitOfWork.GetRepository<Events>().ExecuteStoredProcedure(Constant.DatabaseObject.StoredProcedure.GetEvents, argsLocale);//LOCALE
 
 					if (!ReferenceEquals(fullListOfCalendars,null))
 					{
@@ -367,7 +367,7 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 								DateCreated = DateTime.UtcNow,
 								Locale = market.Language
 							});
-							this.logger.LogInformation($"Batch generated a new Calendar on DB and Azure storage: {calendar.DueDateHash}");
+							this.logger.LogInformation($"Batch generated a new Calendar on DB and Azure storage: {calendar.DueDateHash} for market {market.Language}");
 
 						}
 					}
@@ -375,6 +375,8 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 					
 
 				}
+
+				this.logger.LogWarning($"Update Calendar Batch Ended for : {market.Language} at {DateTime.UtcNow}");
 
 			}
 			catch (System.Exception ex)
@@ -473,11 +475,19 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 						break;
 
 				}
+
+				int year, month, day, hour, minute, second;
+				Int32.TryParse(startTime.Year.ToString(), out year);
+				Int32.TryParse(startTime.Month.ToString(), out month);
+				Int32.TryParse(startTime.Day.ToString(), out day);
+				Int32.TryParse(startTime.Hour.ToString(), out hour);
+				Int32.TryParse(startTime.Minute.ToString(), out minute);
+				Int32.TryParse(startTime.Second.ToString(), out second);
 				var iCalEvent = new Ical.Net.CalendarComponents.CalendarEvent
 				{	
 					Summary = events.Title,
 					Description = events.Description,
-					Start =  new CalDateTime(Int32.Parse(startTime.Year.ToString()), Int32.Parse(startTime.Month.ToString()), Int32.Parse(startTime.Day.ToString()), Int32.Parse(startTime.Hour.ToString()), Int32.Parse(startTime.Minute.ToString()), Int32.Parse(startTime.Second.ToString())),
+					Start =  new CalDateTime(year, month, day, hour, minute, second),
 					IsAllDay = true,
 					Location = events.URL
 				};

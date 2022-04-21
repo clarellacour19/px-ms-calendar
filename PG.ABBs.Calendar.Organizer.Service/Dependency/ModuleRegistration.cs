@@ -49,18 +49,17 @@ namespace PG.ABBs.Calendar.Organizer.Service.Dependency
 
                 if (isDevelopment)
                 {
-                    services.AddDbContext<DataContext>(options => options.UseSqlServer(configuration[Constant.ConnectionString]));
+                    services.AddDbContextPool<DataContext>(options => options.UseSqlServer(configuration[Constant.ConnectionString]));
                 }
                 else
                 {
-                    services.AddDbContext<DataContext>(options => options.UseSqlServer(configuration[Constant.KeyVaultConnectionString]));
+                    services.AddDbContextPool<DataContext>(options => options.UseSqlServer(configuration[Constant.KeyVaultConnectionString]));
                 }
                 services.PostConfigure<List<MarketSettings>>(marketOptions =>
                 {
                     foreach (var market in marketOptions)
                     {
-                        market.PreviewApiKey = configuration[ $"{Constant.KeyVaultPreviewApiKey}-{market.SpaceId}"];
-                        market.DeliveryApiKey = configuration[$"{Constant.KeyVaultDeliveryApiKey}-{market.SpaceId}"];
+	                    market.DeliveryApiKey = configuration[$"{Constant.KeyVaultDeliveryApiKey}-{market.SpaceId}"];
                         market.ManagementApiKey = configuration[Constant.KeyVaultManagementApiKey];
                     }
                 });

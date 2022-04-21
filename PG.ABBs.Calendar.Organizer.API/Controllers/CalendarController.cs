@@ -13,10 +13,12 @@ namespace PG.ABBs.Calendar.Organizer.API.Controllers
 	public class CalendarController : Controller
 	{
 		private readonly ICalendarService calendarService;
+		private readonly ILogger logger;
 
-		public CalendarController(ICalendarService calendarService)
+		public CalendarController(ICalendarService calendarService, ILogger<CalendarController> loggerProvider)
 		{
 			this.calendarService = calendarService;
+			this.logger = loggerProvider;
 		}
 
 
@@ -36,7 +38,7 @@ namespace PG.ABBs.Calendar.Organizer.API.Controllers
 			catch (Exception ex)
 			{
 				apiResponse.UpdateResultWithException(Constants.ErrorCodes.Failed, ex);
-				Console.WriteLine($"Get All Fields error: {ex.Message} {ex.StackTrace}");
+				this.logger.LogError($"Error during BatchUpdateCalendar: {DateTime.UtcNow} - {ex.Message} - {ex.StackTrace}");
 			}
 
 			return this.Json(apiResponse);
@@ -58,7 +60,7 @@ namespace PG.ABBs.Calendar.Organizer.API.Controllers
 			catch (Exception ex)
 			{
 				apiResponse.UpdateResultWithException(Constants.ErrorCodes.Failed, ex);
-				Console.WriteLine($"Get All Fields error: {ex.Message} {ex.StackTrace}");
+				this.logger.LogError($"Error during GenerateCalendar: {DateTime.UtcNow} - {ex.Message} - {ex.StackTrace}");
 			}
 
 			return this.Json(apiResponse);
@@ -79,7 +81,7 @@ namespace PG.ABBs.Calendar.Organizer.API.Controllers
 			catch (Exception ex)
 			{
 				apiResponse.UpdateResultWithException(Constants.ErrorCodes.Failed, ex);
-				Console.WriteLine($"Get All Fields error: {ex.Message} {ex.StackTrace}");
+				this.logger.LogError($"Error during GetUserCalendar: {DateTime.UtcNow} - {ex.Message} - {ex.StackTrace}");
 			}
 
 			return this.Json(apiResponse);
