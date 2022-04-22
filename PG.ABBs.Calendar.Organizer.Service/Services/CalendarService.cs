@@ -34,9 +34,7 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 		private readonly IOptions<List<MarketSettings>> marketSettings;
 
 
-
 		private readonly ContentManager contentManager;
-
 
 
 		private readonly ILogger logger;
@@ -47,7 +45,6 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 			IUnitOfWork<DataContext> unitOfWork,
 			ContentManager contentManager,
 			IOptions<List<MarketSettings>> marketSettings,
-	
 			IOptions<List<string>> contentTypeSettings,
 			MarketSettingsHelper marketSettingsHelper,
 			StorageClient storageClient,
@@ -58,7 +55,7 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 			this.marketSettings = marketSettings;
 
 			this.storageClient = storageClient;
-		
+
 			this.logger = loggerProvider;
 		}
 

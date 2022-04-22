@@ -9,15 +9,16 @@
 
 namespace PG.ABBs.Calendar.Organizer.Service.Exception
 {
-    using System;
-    using System.Collections.Generic;
+	using System;
+	using System.Collections.Generic;
 
-    public class CustomException : Exception
-    {
-        public CustomException(string message, IList<Exception> exceptionList): base(message)
-        {
-            this.ExceptionList = exceptionList;
-        }
-        public IList<Exception> ExceptionList { get; set; }
-    }
+	public class CustomException : Exception
+	{
+		public CustomException(string message, IList<Exception> exceptionList) : base(message)
+		{
+			this.ExceptionList = exceptionList;
+		}
+
+		public IList<Exception> ExceptionList { get; set; }
+	}
 }

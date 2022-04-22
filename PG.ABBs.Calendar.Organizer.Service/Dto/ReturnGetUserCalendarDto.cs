@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace PG.ABBs.Calendar.Organizer.Service.Dto
 {
 	public class ReturnGetUserCalendarDto
-	{	
+	{
 		public List<CalendarDto> Calendar { get; set; }
 	}
 }

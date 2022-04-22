@@ -9,8 +9,8 @@
 
 namespace PG.ABBs.Calendar.Organizer.API
 {
-    public class JobParameter
-    {
-        public string Locale { get; set; }
-    }
+	public class JobParameter
+	{
+		public string Locale { get; set; }
+	}
 }

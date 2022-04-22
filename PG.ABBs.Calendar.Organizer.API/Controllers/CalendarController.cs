@@ -5,7 +5,8 @@ using PG.ABBs.Calendar.Organizer.Service.Dto;
 using PG.ABBs.Calendar.Organizer.Service.Services;
 
 namespace PG.ABBs.Calendar.Organizer.API.Controllers
-{	/// </summary>
+{
+	/// </summary>
 	[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
 	[Route("api/[controller]")]
 	[Produces("application/json")]
@@ -24,21 +25,19 @@ namespace PG.ABBs.Calendar.Organizer.API.Controllers
 
 		[HttpPost]
 		[Route("BatchUpdateCalendar")]
-		public IActionResult BatchUpdateCalendar([FromBody] BatchUpdateCalendarDto Dto )
+		public IActionResult BatchUpdateCalendar([FromBody] BatchUpdateCalendarDto Dto)
 		{
 			var apiResponse = new ApiResponse();
 			try
 			{
-				Response.OnCompleted(async () =>
-				{
-					await this.calendarService.BatchUpdateCalendar(Dto);
-				});
+				Response.OnCompleted(async () => { await this.calendarService.BatchUpdateCalendar(Dto); });
 				apiResponse.UpdateResult(Constants.ErrorCodes.Ok, null);
 			}
 			catch (Exception ex)
 			{
 				apiResponse.UpdateResultWithException(Constants.ErrorCodes.Failed, ex);
-				this.logger.LogError($"Error during BatchUpdateCalendar: {DateTime.UtcNow} - {ex.Message} - {ex.StackTrace}");
+				this.logger.LogError(
+					$"Error during BatchUpdateCalendar: {DateTime.UtcNow} - {ex.Message} - {ex.StackTrace}");
 			}
 
 			return this.Json(apiResponse);
@@ -51,16 +50,14 @@ namespace PG.ABBs.Calendar.Organizer.API.Controllers
 			var apiResponse = new ApiResponse();
 			try
 			{
-				Response.OnCompleted(async () =>
-				{
-					 this.calendarService.GenerateCalendar(Dto);
-				});
+				Response.OnCompleted(async () => { this.calendarService.GenerateCalendar(Dto); });
 				apiResponse.UpdateResult(Constants.ErrorCodes.Ok, null);
 			}
 			catch (Exception ex)
 			{
 				apiResponse.UpdateResultWithException(Constants.ErrorCodes.Failed, ex);
-				this.logger.LogError($"Error during GenerateCalendar: {DateTime.UtcNow} - {ex.Message} - {ex.StackTrace}");
+				this.logger.LogError(
+					$"Error during GenerateCalendar: {DateTime.UtcNow} - {ex.Message} - {ex.StackTrace}");
 			}
 
 			return this.Json(apiResponse);
@@ -73,19 +70,17 @@ namespace PG.ABBs.Calendar.Organizer.API.Controllers
 			var apiResponse = new ApiResponse();
 			try
 			{
-				
 				var fromObject = this.calendarService.GetUserCalendar(Dto);
 				apiResponse.UpdateResult(Constants.ErrorCodes.Ok, fromObject);
-
 			}
 			catch (Exception ex)
 			{
 				apiResponse.UpdateResultWithException(Constants.ErrorCodes.Failed, ex);
-				this.logger.LogError($"Error during GetUserCalendar: {DateTime.UtcNow} - {ex.Message} - {ex.StackTrace}");
+				this.logger.LogError(
+					$"Error during GetUserCalendar: {DateTime.UtcNow} - {ex.Message} - {ex.StackTrace}");
 			}
 
 			return this.Json(apiResponse);
 		}
-
 	}
 }

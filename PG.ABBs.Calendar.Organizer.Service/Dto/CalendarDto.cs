@@ -15,7 +15,5 @@ namespace PG.ABBs.Calendar.Organizer.Service.Dto
 		public DateTime DateCreated { get; set; }
 		public string Locale { get; set; }
 		public string CdnUrl { get; set; }
-
-
 	}
 }

@@ -37,7 +37,6 @@ services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 services.AddSwaggerGen(
 	options =>
 	{
-
 		options.SwaggerDoc(
 			"v1",
 			new OpenApiInfo
@@ -47,8 +46,6 @@ services.AddSwaggerGen(
 				Description =
 					"The Calendar Organizer Microservice HTTP API. This is all microservice API endpoints"
 			});
-
-
 	});
 
 services.AddCors(
@@ -77,6 +74,7 @@ else
 	// The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
 	app.UseHsts();
 }
+
 app.UseCors(x => x
 	.AllowAnyOrigin()
 	.AllowAnyMethod()
@@ -106,6 +104,7 @@ app.Use(async (context, next) =>
 		{
 			context.Request.Headers.Add("Authorization", "Bearer " + token);
 		}
+
 		await next();
 	}
 	catch (Exception ex)

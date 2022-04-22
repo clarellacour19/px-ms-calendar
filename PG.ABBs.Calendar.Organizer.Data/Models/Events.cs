@@ -9,9 +9,7 @@ namespace PG.ABBs.Calendar.Organizer.Data.Models
 {
 	public class Events
 	{
-
-		[Key]
-		public Guid EventId { get; set; }
+		[Key] public Guid EventId { get; set; }
 
 		public string ContentId { get; set; }
 		public DateTime LastCreated { get; set; }
