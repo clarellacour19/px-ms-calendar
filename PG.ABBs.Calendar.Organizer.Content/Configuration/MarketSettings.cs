@@ -31,5 +31,6 @@ namespace PG.ABBs.Calendar.Organizer.Content.Configuration
         public string SiteName { get; set; }
         public string SiteId { get; set; }
         public int DeleteTimeSpan { get; set; }
+        public string CdnPrefix { get; set; }
     }
 }

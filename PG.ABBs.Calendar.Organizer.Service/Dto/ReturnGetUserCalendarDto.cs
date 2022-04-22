@@ -9,6 +9,6 @@ namespace PG.ABBs.Calendar.Organizer.Service.Dto
 {
 	public class ReturnGetUserCalendarDto
 	{	
-		public List<Data.Models.Calendar> Calendar { get; set; }
+		public List<CalendarDto> Calendar { get; set; }
 	}
 }
