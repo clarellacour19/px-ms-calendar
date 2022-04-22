@@ -27,7 +27,7 @@ RUN apt-get update && \
 ENV JAVA_HOME /usr/lib/jvm/java-11-openjdk-amd64/
 
 # Begin sonar
-RUN dotnet tool install --global dotnet-sonarscanner --version 5.3.1
+RUN dotnet tool install --global dotnet-sonarscanner --version 5.5.3
 ENV PATH="${PATH}:/root/.dotnet/tools"
 RUN dotnet sonarscanner begin /k:"PX-Pampers-Microservices" /d:sonar.login="87fc8564b03ef79f0a14ef21c2511ba99bc3106c" /d:sonar.host.url="https://sonarqubeenterprise.pgcloud.com/sonarqube" /d:sonar.branch.name="DS"
 RUN dotnet build "PG.ABBs.Calendar.Organizer.API.csproj" -c Release -o /app/build
