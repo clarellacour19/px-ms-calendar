@@ -1,5 +1,20 @@
 ﻿
-/****** Object:  Table [dbo].[Calendar]    Script Date: 20/04/2022 21:23:02 ******/
+/****** Object:  Index [index_calendar]    Script Date: 22/04/2022 17:03:53 ******/
+DROP INDEX [index_calendar] ON [dbo].[Calendar]
+GO
+/****** Object:  Table [dbo].[UserCalendar]    Script Date: 22/04/2022 17:03:53 ******/
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[UserCalendar]') AND type in (N'U'))
+DROP TABLE [dbo].[UserCalendar]
+GO
+/****** Object:  Table [dbo].[Events]    Script Date: 22/04/2022 17:03:53 ******/
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Events]') AND type in (N'U'))
+DROP TABLE [dbo].[Events]
+GO
+/****** Object:  Table [dbo].[Calendar]    Script Date: 22/04/2022 17:03:53 ******/
+IF  EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[Calendar]') AND type in (N'U'))
+DROP TABLE [dbo].[Calendar]
+GO
+/****** Object:  Table [dbo].[Calendar]    Script Date: 22/04/2022 17:03:53 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -17,7 +32,7 @@ CREATE TABLE [dbo].[Calendar](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[Events]    Script Date: 20/04/2022 21:23:02 ******/
+/****** Object:  Table [dbo].[Events]    Script Date: 22/04/2022 17:03:53 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -39,7 +54,7 @@ CREATE TABLE [dbo].[Events](
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY] TEXTIMAGE_ON [PRIMARY]
 GO
-/****** Object:  Table [dbo].[UserCalendar]    Script Date: 20/04/2022 21:23:02 ******/
+/****** Object:  Table [dbo].[UserCalendar]    Script Date: 22/04/2022 17:03:53 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -55,4 +70,13 @@ CREATE TABLE [dbo].[UserCalendar](
 	[UserCalendarId] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
+GO
+SET ANSI_PADDING ON
+GO
+/****** Object:  Index [index_calendar]    Script Date: 22/04/2022 17:03:53 ******/
+CREATE NONCLUSTERED INDEX [index_calendar] ON [dbo].[Calendar]
+(
+	[Locale] ASC,
+	[DueDateHash] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, SORT_IN_TEMPDB = OFF, DROP_EXISTING = OFF, ONLINE = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 GO

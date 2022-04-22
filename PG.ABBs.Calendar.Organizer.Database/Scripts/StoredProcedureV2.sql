@@ -1,6 +1,31 @@
-﻿
-
-/****** Object:  StoredProcedure [dbo].[AddOrUpdateCalendars]    Script Date: 20/04/2022 21:31:22 ******/
+﻿/****** Object:  StoredProcedure [dbo].[GetUserCalendars]    Script Date: 22/04/2022 17:02:52 ******/
+DROP PROCEDURE [dbo].[GetUserCalendars]
+GO
+/****** Object:  StoredProcedure [dbo].[GetEvents]    Script Date: 22/04/2022 17:02:52 ******/
+DROP PROCEDURE [dbo].[GetEvents]
+GO
+/****** Object:  StoredProcedure [dbo].[GetCalendars]    Script Date: 22/04/2022 17:02:52 ******/
+DROP PROCEDURE [dbo].[GetCalendars]
+GO
+/****** Object:  StoredProcedure [dbo].[GetAllCalendars]    Script Date: 22/04/2022 17:02:52 ******/
+DROP PROCEDURE [dbo].[GetAllCalendars]
+GO
+/****** Object:  StoredProcedure [dbo].[DeleteEvent]    Script Date: 22/04/2022 17:02:52 ******/
+DROP PROCEDURE [dbo].[DeleteEvent]
+GO
+/****** Object:  StoredProcedure [dbo].[DeleteCalendar]    Script Date: 22/04/2022 17:02:52 ******/
+DROP PROCEDURE [dbo].[DeleteCalendar]
+GO
+/****** Object:  StoredProcedure [dbo].[AddOrUpdateUserCalendar]    Script Date: 22/04/2022 17:02:52 ******/
+DROP PROCEDURE [dbo].[AddOrUpdateUserCalendar]
+GO
+/****** Object:  StoredProcedure [dbo].[AddOrUpdateEvents]    Script Date: 22/04/2022 17:02:52 ******/
+DROP PROCEDURE [dbo].[AddOrUpdateEvents]
+GO
+/****** Object:  StoredProcedure [dbo].[AddOrUpdateCalendars]    Script Date: 22/04/2022 17:02:52 ******/
+DROP PROCEDURE [dbo].[AddOrUpdateCalendars]
+GO
+/****** Object:  StoredProcedure [dbo].[AddOrUpdateCalendars]    Script Date: 22/04/2022 17:02:52 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -11,7 +36,8 @@ GO
 
 
 
-CREATE PROCEDURE [dbo].[AddOrUpdateCalendars]
+
+CREATE   PROCEDURE [dbo].[AddOrUpdateCalendars]
 @uuidHash nvarchar(max),
 @dueDate datetime,
 @dueDateHash nvarchar(max),
@@ -22,7 +48,7 @@ AS
 BEGIN
 
 SET NOCOUNT ON
-IF(SELECT COUNT(*) FROM Calendar WHERE DueDateHash = @dueDateHash AND Locale = @locale) > 0
+IF(SELECT COUNT(CalendarId) FROM Calendar WHERE DueDateHash = @dueDateHash AND Locale = @locale) > 0
 BEGIN
 --UPDATE
 BEGIN TRANSACTION T1;
@@ -78,7 +104,7 @@ END
 
 END;
 GO
-/****** Object:  StoredProcedure [dbo].[AddOrUpdateEvents]    Script Date: 20/04/2022 21:31:22 ******/
+/****** Object:  StoredProcedure [dbo].[AddOrUpdateEvents]    Script Date: 22/04/2022 17:02:52 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -88,7 +114,8 @@ GO
 
 
 
-CREATE PROCEDURE [dbo].[AddOrUpdateEvents] 
+
+CREATE   PROCEDURE [dbo].[AddOrUpdateEvents] 
 @contentId nvarchar(max),
 @lastCreated DateTime,
 @title nvarchar(max),
@@ -103,7 +130,7 @@ AS
 BEGIN
 
 SET NOCOUNT ON
-IF(SELECT COUNT(*) FROM Events WHERE ContentId = @contentId AND Locale = @locale) > 0
+IF(SELECT COUNT(EventId) FROM Events WHERE ContentId = @contentId AND Locale = @locale) > 0
 BEGIN
 --UPDATE
 BEGIN TRANSACTION T1;
@@ -153,7 +180,7 @@ END
 
 END;
 GO
-/****** Object:  StoredProcedure [dbo].[AddOrUpdateUserCalendar]    Script Date: 20/04/2022 21:31:22 ******/
+/****** Object:  StoredProcedure [dbo].[AddOrUpdateUserCalendar]    Script Date: 22/04/2022 17:02:52 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -162,7 +189,8 @@ GO
 
 
 
-CREATE PROCEDURE [dbo].[AddOrUpdateUserCalendar] 
+
+CREATE   PROCEDURE [dbo].[AddOrUpdateUserCalendar] 
 @uuidHash nvarchar(max),
 @dueDateHash nvarchar(max),
 @calenderId nvarchar(max),
@@ -172,7 +200,7 @@ AS
 BEGIN
 
 SET NOCOUNT ON
-IF(SELECT COUNT(*) FROM UserCalendar WHERE UuidHash = @uuidHash AND DueDateHash = @dueDateHash AND Locale = @locale) > 0
+IF(SELECT COUNT(UserCalendarId) FROM UserCalendar WHERE UuidHash = @uuidHash AND DueDateHash = @dueDateHash AND Locale = @locale) > 0
 BEGIN
 --UPDATE
 BEGIN TRANSACTION T1;
@@ -208,7 +236,7 @@ END
 
 END;
 GO
-/****** Object:  StoredProcedure [dbo].[DeleteCalendar]    Script Date: 20/04/2022 21:31:22 ******/
+/****** Object:  StoredProcedure [dbo].[DeleteCalendar]    Script Date: 22/04/2022 17:02:52 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -234,7 +262,7 @@ COMMIT TRANSACTION T2;
 
 END;
 GO
-/****** Object:  StoredProcedure [dbo].[DeleteEvent]    Script Date: 20/04/2022 21:31:22 ******/
+/****** Object:  StoredProcedure [dbo].[DeleteEvent]    Script Date: 22/04/2022 17:02:52 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -252,7 +280,7 @@ WHERE ContentId = @contentId
 
 END;
 GO
-/****** Object:  StoredProcedure [dbo].[GetAllCalendars]    Script Date: 20/04/2022 21:31:22 ******/
+/****** Object:  StoredProcedure [dbo].[GetAllCalendars]    Script Date: 22/04/2022 17:02:52 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -278,7 +306,7 @@ END
 
 END;
 GO
-/****** Object:  StoredProcedure [dbo].[GetCalendars]    Script Date: 20/04/2022 21:31:22 ******/
+/****** Object:  StoredProcedure [dbo].[GetCalendars]    Script Date: 22/04/2022 17:02:52 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -311,7 +339,7 @@ END
 
 END;
 GO
-/****** Object:  StoredProcedure [dbo].[GetEvents]    Script Date: 20/04/2022 21:31:22 ******/
+/****** Object:  StoredProcedure [dbo].[GetEvents]    Script Date: 22/04/2022 17:02:52 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -336,7 +364,7 @@ END
 
 END;
 GO
-/****** Object:  StoredProcedure [dbo].[GetUserCalendars]    Script Date: 20/04/2022 21:31:22 ******/
+/****** Object:  StoredProcedure [dbo].[GetUserCalendars]    Script Date: 22/04/2022 17:02:52 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
