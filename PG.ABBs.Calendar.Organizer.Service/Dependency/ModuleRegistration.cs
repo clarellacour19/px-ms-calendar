@@ -58,6 +58,7 @@ namespace PG.ABBs.Calendar.Organizer.Service.Dependency
 				{
 					foreach (var market in marketOptions)
 					{
+						market.PreviewApiKey = configuration[$"{Constant.KeyVaultPreviewApiKey}-{market.SpaceId}"];
 						market.DeliveryApiKey = configuration[$"{Constant.KeyVaultDeliveryApiKey}-{market.SpaceId}"];
 						market.ManagementApiKey = configuration[Constant.KeyVaultManagementApiKey];
 					}
