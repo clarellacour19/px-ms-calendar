@@ -13,7 +13,7 @@ COPY ["PG.ABBs.Calendar.Organizer.Service/PG.ABBs.Calendar.Organizer.Service.csp
 COPY ["PG.ABBs.Calendar.Organizer.Content/PG.ABBs.Calendar.Organizer.Content.csproj", "./"]
 COPY ["PG.ABBs.Calendar.Organizer.AzureStorage/PG.ABBs.Calendar.Organizer.AzureStorage.csproj", "./"]
 COPY ["PG.ABBs.Calendar.Organizer.Data/PG.ABBs.Calendar.Organizer.Data.csproj", "./"]
-RUN dotnet restore 
+RUN dotnet restore "PG.ABBs.Calendar.Organizer.API/PG.ABBs.Calendar.Organizer.API.csproj"
 COPY . ./
 WORKDIR "/src/"
 # Install OpenJDK-8
