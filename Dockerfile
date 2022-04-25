@@ -5,14 +5,15 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src
-COPY ["PG.ABBs.Calendar.Organizer.API/PG.ABBs.Calendar.Organizer.API.csproj", "./"]
-COPY ["PG.ABBs.Calendar.Organizer.LogService/PG.ABBs.Calendar.Organizer.LogService.csproj", "./"]
-COPY ["PG.ABBs.Calendar.Organizer.LogAnalytics/PG.ABBs.Calendar.Organizer.LogAnalytics.csproj", "./"]
-COPY ["PG.ABBs.Calendar.Organizer.DependencyResolution/PG.ABBs.Calendar.Organizer.DependencyResolution.csproj", "./"]
-COPY ["PG.ABBs.Calendar.Organizer.Service/PG.ABBs.Calendar.Organizer.Service.csproj", "./"]
-COPY ["PG.ABBs.Calendar.Organizer.Content/PG.ABBs.Calendar.Organizer.Content.csproj", "./"]
-COPY ["PG.ABBs.Calendar.Organizer.AzureStorage/PG.ABBs.Calendar.Organizer.AzureStorage.csproj", "./"]
-COPY ["PG.ABBs.Calendar.Organizer.Data/PG.ABBs.Calendar.Organizer.Data.csproj", "./"]
+
+COPY ["PG.ABBs.Calendar.Organizer.API/PG.ABBs.Calendar.Organizer.API.csproj", "PG.ABBs.Calendar.Organizer.API/"]
+COPY ["PG.ABBs.Calendar.Organizer.LogService/PG.ABBs.Calendar.Organizer.LogService.csproj", "PG.ABBs.Calendar.Organizer.LogService/"]
+COPY ["PG.ABBs.Calendar.Organizer.LogAnalytics/PG.ABBs.Calendar.Organizer.LogAnalytics.csproj", "PG.ABBs.Calendar.Organizer.LogAnalytics/"]
+COPY ["PG.ABBs.Calendar.Organizer.DependencyResolution/PG.ABBs.Calendar.Organizer.DependencyResolution.csproj", "PG.ABBs.Calendar.Organizer.DependencyResolution/"]
+COPY ["PG.ABBs.Calendar.Organizer.Service/PG.ABBs.Calendar.Organizer.Service.csproj", "PG.ABBs.Calendar.Organizer.Service/"]
+COPY ["PG.ABBs.Calendar.Organizer.Content/PG.ABBs.Calendar.Organizer.Content.csproj", "PG.ABBs.Calendar.Organizer.Content/"]
+COPY ["PG.ABBs.Calendar.Organizer.AzureStorage/PG.ABBs.Calendar.Organizer.AzureStorage.csproj", "PG.ABBs.Calendar.Organizer.AzureStorage/"]
+COPY ["PG.ABBs.Calendar.Organizer.Data/PG.ABBs.Calendar.Organizer.Data.csproj", "PG.ABBs.Calendar.Organizer.Data/"]
 RUN dotnet restore "PG.ABBs.Calendar.Organizer.API/PG.ABBs.Calendar.Organizer.API.csproj"
 COPY . ./
 WORKDIR "/src/"
