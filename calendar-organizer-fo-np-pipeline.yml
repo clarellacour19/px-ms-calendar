@@ -90,8 +90,8 @@ stages:
         inputs:
           command: 'push'
           artifactoryService: 'PX-JFrog-Artifactory-ServiceConnection'
-          targetRepo: 'pamper-calendarorganizer-virtual'
-          imageName: 'png.jfrog.io/pamper-calendarorganizer-virtual/calendarorganizer:$(Build.BuildNumber)'
+          targetRepo: 'pamper-calendarorganizervirtual'
+          imageName: 'png.jfrog.io/pamper-calendarorganizervirtual/calendarorganizer:$(Build.BuildNumber)'
           collectBuildInfo: true
           buildName: '$(Build.DefinitionName)'
           buildNumber: '$(Build.BuildNumber)'
