@@ -52,86 +52,86 @@ stages:
           Dockerfile: 'Dockerfile'
           tags: '$(Build.BuildNumber)'
       
-      # - task: Docker@2
-      #   displayName: Docker Build
-      #   inputs:
-      #     containerRegistry: 'mbnpmicroservicesregistry'
-      #     repository: 'calendarorganizer'
-      #     command: 'build'
-      #     Dockerfile: 'Dockerfile'
-      #     tags: '$(Build.BuildNumber)'
+      - task: Docker@2
+        displayName: Docker Build
+        inputs:
+          containerRegistry: 'mbnpmicroservicesregistry'
+          repository: 'calendarorganizer'
+          command: 'build'
+          Dockerfile: 'Dockerfile'
+          tags: '$(Build.BuildNumber)'
 
-      # - task: Docker@2
-      #   displayName: Docker Push
-      #   inputs:
-      #     containerRegistry: 'mbnpmicroservicesregistry'
-      #     repository: 'calendarorganizer'
-      #     command: 'push'
-      #     tags: '$(Build.BuildNumber)'
+      - task: Docker@2
+        displayName: Docker Push
+        inputs:
+          containerRegistry: 'mbnpmicroservicesregistry'
+          repository: 'calendarorganizer'
+          command: 'push'
+          tags: '$(Build.BuildNumber)'
 
-      # - task: CmdLine@2
-      #   displayName: Docker Pull from ACR
-      #   inputs:
-      #     script: 'docker pull mbnpmicroservicesregistry.azurecr.io/calendarorganizer:$(Build.BuildNumber)'
+      - task: CmdLine@2
+        displayName: Docker Pull from ACR
+        inputs:
+          script: 'docker pull mbnpmicroservicesregistry.azurecr.io/calendarorganizer:$(Build.BuildNumber)'
 
-      # - task: Docker@2
-      #   displayName: Logout of ACR
-      #   inputs:
-      #     containerRegistry: 'mbnpmicroservicesregistry'
-      #     command: 'logout'
+      - task: Docker@2
+        displayName: Logout of ACR
+        inputs:
+          containerRegistry: 'mbnpmicroservicesregistry'
+          command: 'logout'
 
-      # - task: CmdLine@2
-      #   displayName: Tag JFrog Image
-      #   inputs:
-      #     script: 'docker tag mbnpmicroservicesregistry.azurecr.io/calendarorganizer:$(Build.BuildNumber) png.jfrog.io/pamper-calendarorganizer-virtual/calendarorganizer:$(Build.BuildNumber)'
+      - task: CmdLine@2
+        displayName: Tag JFrog Image
+        inputs:
+          script: 'docker tag mbnpmicroservicesregistry.azurecr.io/calendarorganizer:$(Build.BuildNumber) png.jfrog.io/pamper-calendarorganizervirtual/calendarorganizer:$(Build.BuildNumber)'
 
-      # - task: ArtifactoryDocker@1 
-      #   displayName: Push to JFrog
-      #   inputs:
-      #     command: 'push'
-      #     artifactoryService: 'PX-JFrog-Artifactory-ServiceConnection'
-      #     targetRepo: 'pamper-calendarorganizer-virtual'
-      #     imageName: 'png.jfrog.io/pamper-calendarorganizer-virtual/calendarorganizer:$(Build.BuildNumber)'
-      #     collectBuildInfo: true
-      #     buildName: '$(Build.DefinitionName)'
-      #     buildNumber: '$(Build.BuildNumber)'
-      #     projectKey: 'pamper'
-      #     includeEnvVars: true
-      # - task: ArtifactoryCollectIssues@1
-      #   displayName: Jfrog Collect Build Issues
-      #   inputs:
-      #     artifactoryService: 'PX-JFrog-Artifactory-ServiceConnection'
-      #     configSource: 'taskConfiguration'
-      #     taskConfig: |
-      #       version: 1
-      #       issues:
-      #           trackerName: ADO
-      #           regexp: (.+-[0-9]+)\s-\s(.+) 
-      #           keyGroupIndex: 1
-      #           summaryGroupIndex: 2
-      #           trackerUrl: https://dev.azure.com/pg-consumer/px-pampers-restage/_backlogs/backlog/pampers-general/Backlog%20items
-      #           aggregate: true
-      #           aggregationStatus: RELEASED
-      #     buildName: '$(Build.DefinitionName)'
-      #     buildNumber: '$(Build.BuildNumber)'
-      #     projectKey: 'pamper'
+      - task: ArtifactoryDocker@1 
+        displayName: Push to JFrog
+        inputs:
+          command: 'push'
+          artifactoryService: 'PX-JFrog-Artifactory-ServiceConnection'
+          targetRepo: 'pamper-calendarorganizervirtual'
+          imageName: 'png.jfrog.io/pamper-calendarorganizervirtual/calendarorganizer:$(Build.BuildNumber)'
+          collectBuildInfo: true
+          buildName: '$(Build.DefinitionName)'
+          buildNumber: '$(Build.BuildNumber)'
+          projectKey: 'pamper'
+          includeEnvVars: true
+      - task: ArtifactoryCollectIssues@1
+        displayName: Jfrog Collect Build Issues
+        inputs:
+          artifactoryService: 'PX-JFrog-Artifactory-ServiceConnection'
+          configSource: 'taskConfiguration'
+          taskConfig: |
+            version: 1
+            issues:
+                trackerName: ADO
+                regexp: (.+-[0-9]+)\s-\s(.+) 
+                keyGroupIndex: 1
+                summaryGroupIndex: 2
+                trackerUrl: https://dev.azure.com/pg-consumer/px-pampers-restage/_backlogs/backlog/pampers-general/Backlog%20items
+                aggregate: true
+                aggregationStatus: RELEASED
+          buildName: '$(Build.DefinitionName)'
+          buildNumber: '$(Build.BuildNumber)'
+          projectKey: 'pamper'
 
-      # - task: ArtifactoryPublishBuildInfo@1
-      #   displayName: Jfrog Publish Build Issues
-      #   inputs:
-      #     artifactoryService: 'PX-JFrog-Artifactory-ServiceConnection'
-      #     buildName: '$(Build.DefinitionName)'
-      #     buildNumber: '$(Build.BuildNumber)'
-      #     projectKey: 'pamper'
+      - task: ArtifactoryPublishBuildInfo@1
+        displayName: Jfrog Publish Build Issues
+        inputs:
+          artifactoryService: 'PX-JFrog-Artifactory-ServiceConnection'
+          buildName: '$(Build.DefinitionName)'
+          buildNumber: '$(Build.BuildNumber)'
+          projectKey: 'pamper'
 
-      # - task: ArtifactoryXrayScan@1
-      #   displayName: JFrog XRay Scan
-      #   inputs:
-      #     artifactoryService: 'PX-JFrog-Artifactory-ServiceConnection'
-      #     buildName: '$(Build.DefinitionName)'
-      #     buildNumber: '$(Build.BuildNumber)'
-      #     projectKey: 'pamper'
-      #     allowFailBuild: false
+      - task: ArtifactoryXrayScan@1
+        displayName: JFrog XRay Scan
+        inputs:
+          artifactoryService: 'PX-JFrog-Artifactory-ServiceConnection'
+          buildName: '$(Build.DefinitionName)'
+          buildNumber: '$(Build.BuildNumber)'
+          projectKey: 'pamper'
+          allowFailBuild: false
 
 
   - stage: Deploy
