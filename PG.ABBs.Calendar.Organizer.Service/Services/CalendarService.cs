@@ -202,7 +202,7 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 
 					calendarObj = new CalendarDto
 					{
-
+						CalendarId = listOfCalendars.First().CalendarId,
 						UuidHash = uuidHash,
 						DueDate = dueDateParsed,
 						DueDateHash = dueDateHash,
