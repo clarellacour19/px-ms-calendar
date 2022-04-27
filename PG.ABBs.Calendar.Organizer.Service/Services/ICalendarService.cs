@@ -8,6 +8,6 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 
 		ReturnGetUserCalendarDto GetUserCalendar(GetUserCalendarDto Dto);
 
-		List<string> GenerateCalendar(GenerateCalendarDto Dto);
+		CalendarDto GenerateCalendar(GenerateCalendarDto Dto);
 	}
 }

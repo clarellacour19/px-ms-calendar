@@ -50,8 +50,8 @@ namespace PG.ABBs.Calendar.Organizer.API.Controllers
 			var apiResponse = new ApiResponse();
 			try
 			{
-				Response.OnCompleted(async () => { this.calendarService.GenerateCalendar(Dto); });
-				apiResponse.UpdateResult(Constants.ErrorCodes.Ok, null);
+				var fromObject = this.calendarService.GenerateCalendar(Dto);
+				apiResponse.UpdateResult(Constants.ErrorCodes.Ok, fromObject);
 			}
 			catch (Exception ex)
 			{

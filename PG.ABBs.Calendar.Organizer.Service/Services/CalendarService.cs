@@ -119,7 +119,7 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 			return result;
 		}
 
-		public List<string> GenerateCalendar(GenerateCalendarDto Dto)
+		public CalendarDto GenerateCalendar(GenerateCalendarDto Dto)
 		{
 			var errorList = new List<String>();
 			string site, locale, uuidHash, dueDate = null;
@@ -141,7 +141,8 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 				var dueDateHash = OrganizerHelper.CreateMD5(dueDate.ToString());
 				var dueDateParsed = new DateTime();
 				DateTime.TryParse(dueDate, out dueDateParsed);
-
+				var market = marketSettings.Value.Where(m => m.Language.Equals(locale)).First();
+				CalendarDto calendarObj = new CalendarDto();
 
 				var argsToGetDueDateHash = new Dictionary<string, object>
 				{
@@ -171,6 +172,19 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 						DateCreated = DateTime.UtcNow,
 						Locale = locale
 					});
+
+					calendarObj = new CalendarDto
+					{
+						
+						UuidHash = uuidHash,
+						DueDate = dueDateParsed,
+						DueDateHash = dueDateHash,
+						DateCreated = DateTime.UtcNow,
+						Locale = locale,
+						CdnUrl = $"{market.CdnPrefix}/{dueDateHash}"
+
+					};
+
 				}
 				else
 				{
@@ -185,16 +199,31 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 
 					this.unitOfWork.GetRepository<UserCalendar>().ExecuteNonQueryStoredProcedure(
 						Constant.DatabaseObject.StoredProcedure.AddOrUpdateUserCalendar, argsToAddUserCalender);
+
+					calendarObj = new CalendarDto
+					{
+
+						UuidHash = uuidHash,
+						DueDate = dueDateParsed,
+						DueDateHash = dueDateHash,
+						DateCreated = DateTime.UtcNow,
+						Locale = locale,
+						CdnUrl = $"{market.CdnPrefix}/{dueDateHash}"
+
+					};
 				}
+
+				return calendarObj;
 			}
 			catch (System.Exception ex)
 			{
 				this.logger.LogError(
 					$"Error during  generate calendar: {DateTime.UtcNow} - {ex.Message} - {ex.StackTrace} for market {locale}");
 				errorList.Add($"Error during generate calendar: {ex.Message} - {DateTime.UtcNow} for market {locale}");
+				throw;
 			}
 
-			return errorList;
+			
 		}
 
 		public ReturnGetUserCalendarDto GetUserCalendar(GetUserCalendarDto Dto)
