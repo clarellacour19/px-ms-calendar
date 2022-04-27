@@ -28,9 +28,10 @@ namespace PG.ABBs.Calendar.Organizer.Content.Configuration
 		public int MaxNumberOfRateLimitRetries { get; set; }
 
 		public string Environment { get; set; }
+		public string DomainName { get; set; }
 		public string SiteName { get; set; }
-		public string SiteId { get; set; }
 		public int DeleteTimeSpan { get; set; }
 		public string CdnPrefix { get; set; }
+		public string TimeZone { get; set; }
 	}
 }

@@ -5,12 +5,14 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using Contentful.Core.Extensions;
+using Ical.Net;
 using Ical.Net.CalendarComponents;
 using Ical.Net.DataTypes;
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using Microsoft.EntityFrameworkCore.SqlServer.Query.Internal;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.VisualBasic;
 using NodaTime;
 using PG.ABBs.Calendar.Organizer.AzureStorage;
 using PG.ABBs.Calendar.Organizer.Content;
@@ -158,9 +160,9 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 				if (!listOfCalendars.Any())
 				{
 					//generate new calender amd upload to storage
-					var calendar = GenerateCalender(dueDateParsed, locale, dueDateHash);
+					var calendar = GenerateCalender(dueDateParsed, locale, dueDateHash,market);
 
-					this.storageClient.UploadCalendar(calendar, locale);
+					this.storageClient.UploadCalendar(calendar, locale,dueDateHash);
 
 					//add to db
 
@@ -395,11 +397,11 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 						{
 							//GENERATE NEW CALENDER
 
-							var newCalender = GenerateCalender(calendar.DueDate, market.Language, calendar.DueDateHash);
+							var newCalender = GenerateCalender(calendar.DueDate, market.Language, calendar.DueDateHash,market);
 							//listOfGeneratedCals.Add(newCalender);
 							//listOfCalsToDel.Add(newCalender.Name);
-							this.storageClient.DeleteCalendar(newCalender.Name, market.Language);
-							this.storageClient.UploadCalendar(newCalender, market.Language);
+							this.storageClient.DeleteCalendar($"{calendar.DueDateHash}", market.Language);
+							this.storageClient.UploadCalendar(newCalender, market.Language, calendar.DueDateHash);
 							//update db
 
 							AddOrUpdateCalendar<Data.Models.Calendar>(new Data.Models.Calendar()
@@ -478,14 +480,24 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 					argsToGet);
 		}
 
-		public Ical.Net.Calendar GenerateCalender(DateTime dueDate, string locale, string dueDateHash)
+		public Ical.Net.Calendar GenerateCalender(DateTime dueDate, string locale, string dueDateHash, MarketSettings market)
 		{
 			//new calender initilized
-			var calendar = new Ical.Net.Calendar()
+			var calendar = new Ical.Net.Calendar();
+
+			calendar.Name = "VCALENDAR";//dueDateHash.ToString();
+			calendar.Properties.Add(new CalendarProperty("X-WR-CALNAME", "Pampers Calendar"));
+			calendar.Version = "2.0";
+			calendar.ProductId = $"-//{market.DomainName}//Calendar Organizer 1.0//EN";
+			calendar.AddTimeZone($"{market.TimeZone}");
+			var alarm = new Alarm
 			{
-				Name = dueDateHash
+				Action = "DISPLAY",
+				Description = "PAMPERS 💛 Your Personal Pregnancy Guide",
+				Trigger = new Trigger(TimeSpan.FromHours(-10))
 			};
 
+			calendar.Properties.Add(new CalendarProperty("REFRESH-INTERVAL;VALUE=DURATION", "P12H"));
 
 			//get list of events for that locale
 			var argsToGetall = new Dictionary<string, object>
@@ -533,13 +545,24 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 				Int32.TryParse(startTime.Hour.ToString(), out hour);
 				Int32.TryParse(startTime.Minute.ToString(), out minute);
 				Int32.TryParse(startTime.Second.ToString(), out second);
+				var date = new CalDateTime(year, month, day, hour, minute, second);
 				var iCalEvent = new Ical.Net.CalendarComponents.CalendarEvent
-				{
+				{	
+					DtStamp = new CalDateTime(DateTime.UtcNow),
+					Uid = $"{events.ContentId}-{locale}@{market.DomainName}",
+					DtStart = date,
+					DtEnd = date,
 					Summary = events.Title,
 					Description = events.Description,
-					Start = new CalDateTime(year, month, day, hour, minute, second),
+					Start = date,
 					IsAllDay = true,
-					Location = events.URL
+					Location = events.URL,
+					Alarms =
+					{
+						alarm
+					}
+
+
 				};
 
 				calendar.Events.Add(iCalEvent);

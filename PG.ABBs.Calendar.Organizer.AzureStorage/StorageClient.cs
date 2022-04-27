@@ -87,7 +87,7 @@ namespace PG.ABBs.Calendar.Organizer.AzureStorage
 			}
 		}
 
-		public void UploadCalendar(Ical.Net.Calendar CalendarName, string market)
+		public void UploadCalendar(Ical.Net.Calendar CalendarName, string market, string duedateHash)
 		{
 			try
 			{
@@ -95,7 +95,7 @@ namespace PG.ABBs.Calendar.Organizer.AzureStorage
 				string serializedCalendar = iCalSerializer.SerializeToString(CalendarName);
 				var bytesCalendar = Encoding.ASCII.GetBytes(serializedCalendar);
 
-				var blockBlob = container.GetBlobClient(Path.Combine($"{market}/{CalendarName.Name}.ics"));
+				var blockBlob = container.GetBlobClient(Path.Combine($"{market}/{duedateHash}.ics"));
 
 				using (MemoryStream memoryStream = new MemoryStream(bytesCalendar))
 				{
