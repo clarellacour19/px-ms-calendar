@@ -34,6 +34,7 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 		private readonly IUnitOfWork<DataContext> unitOfWork;
 
 		private readonly IOptions<List<MarketSettings>> marketSettings;
+		private readonly IOptions<StorageModel> azureStorage;
 
 
 		private readonly ContentManager contentManager;
@@ -46,6 +47,7 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 		public CalendarService(
 			IUnitOfWork<DataContext> unitOfWork,
 			ContentManager contentManager,
+			IOptions<StorageModel> azureStorage,
 			IOptions<List<MarketSettings>> marketSettings,
 			IOptions<List<string>> contentTypeSettings,
 			MarketSettingsHelper marketSettingsHelper,
@@ -55,7 +57,7 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 			this.unitOfWork = unitOfWork;
 			this.contentManager = contentManager;
 			this.marketSettings = marketSettings;
-
+			this.azureStorage = azureStorage;
 			this.storageClient = storageClient;
 
 			this.logger = loggerProvider;
@@ -183,7 +185,7 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 						DueDateHash = dueDateHash,
 						DateCreated = DateTime.UtcNow,
 						Locale = locale,
-						CdnUrl = $"{market.CdnPrefix}/{dueDateHash}"
+						CdnUrl = $"{azureStorage.Value.CdnPrefix}/{market.Language}/{dueDateHash}"
 
 					};
 
@@ -210,7 +212,7 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 						DueDateHash = dueDateHash,
 						DateCreated = DateTime.UtcNow,
 						Locale = locale,
-						CdnUrl = $"{market.CdnPrefix}/{dueDateHash}"
+						CdnUrl = $"{azureStorage.Value.CdnPrefix}/{market.Language}/{dueDateHash}"
 
 					};
 				}
@@ -272,7 +274,7 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 						DueDate = item.DueDate,
 						UuidHash = item.UuidHash,
 						DueDateHash = item.DueDateHash,
-						CdnUrl = $"{market.First().CdnPrefix}/{item.DueDateHash}",
+						CdnUrl = $"{azureStorage.Value.CdnPrefix}/{market.First().Language}/{item.DueDateHash}",
 						Locale = item.Locale
 					});
 				}

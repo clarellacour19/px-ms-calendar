@@ -12,5 +12,7 @@ namespace PG.ABBs.Calendar.Organizer.AzureStorage
 
 		public string ContainerName { get; set; }
 		public string ConnectionString { get; set; }
+
+		public string CdnPrefix { get; set; }
 	}
 }

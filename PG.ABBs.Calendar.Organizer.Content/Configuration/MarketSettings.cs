@@ -31,7 +31,7 @@ namespace PG.ABBs.Calendar.Organizer.Content.Configuration
 		public string DomainName { get; set; }
 		public string SiteName { get; set; }
 		public int DeleteTimeSpan { get; set; }
-		public string CdnPrefix { get; set; }
+		// string CdnPrefix { get; set; }
 		public string TimeZone { get; set; }
 	}
 }
