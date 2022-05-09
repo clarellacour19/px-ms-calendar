@@ -68,6 +68,7 @@ if (app.Environment.IsDevelopment() || app.Environment.IsStaging())
 {
 	Trace.TraceInformation($"Using {app.Environment.EnvironmentName} Environment");
 	app.UseDeveloperExceptionPage();
+	app.UseHsts();
 }
 else
 {
