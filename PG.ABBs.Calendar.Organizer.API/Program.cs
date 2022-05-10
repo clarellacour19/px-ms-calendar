@@ -64,11 +64,11 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 
 
-if (app.Environment.IsDevelopment() || app.Environment.IsStaging())
+if (app.Environment.IsDevelopment() /*|| app.Environment.IsStaging()*/)
 {
 	Trace.TraceInformation($"Using {app.Environment.EnvironmentName} Environment");
 	app.UseDeveloperExceptionPage();
-	app.UseHsts();
+	//app.UseHsts();
 }
 else
 {
