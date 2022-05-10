@@ -16,7 +16,7 @@ if (config["KeyVault:Vault"] != null
     && config["KeyVault:ClientId"] != null
     && config["KeyVault:ClientSecret"] != null)
 {
-	//config.AddAzureKeyVault(config["KeyVault:Vault"], config["KeyVault:ClientId"], config["KeyVault:ClientSecret"]);
+	config.AddAzureKeyVault(config["KeyVault:Vault"], config["KeyVault:ClientId"], config["KeyVault:ClientSecret"]);
 }
 
 var _authority = config[Constants.Authority];
