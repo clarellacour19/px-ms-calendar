@@ -90,7 +90,7 @@ namespace PG.ABBs.Calendar.Organizer.Service.Dependency
 			services.AddTransient<ClientFactory>();
 			services.AddTransient<ContentManager>();
 			services.AddSingleton<MarketSettingsHelper>();
-			services.AddTransient<StorageClient>();
+			//services.AddTransient<StorageClient>();
 		}
 
 		#endregion

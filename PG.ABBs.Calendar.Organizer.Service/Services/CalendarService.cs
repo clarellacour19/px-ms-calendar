@@ -42,7 +42,7 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 
 		private readonly ILogger logger;
 
-		private readonly StorageClient storageClient;
+		//private readonly StorageClient storageClient;
 
 		public CalendarService(
 			IUnitOfWork<DataContext> unitOfWork,
@@ -51,14 +51,14 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 			IOptions<List<MarketSettings>> marketSettings,
 			IOptions<List<string>> contentTypeSettings,
 			MarketSettingsHelper marketSettingsHelper,
-			StorageClient storageClient,
+			//StorageClient storageClient,
 			ILogger<CalendarService> loggerProvider)
 		{
 			this.unitOfWork = unitOfWork;
 			this.contentManager = contentManager;
 			this.marketSettings = marketSettings;
 			this.azureStorage = azureStorage;
-			this.storageClient = storageClient;
+			//this.storageClient = storageClient;
 
 			this.logger = loggerProvider;
 		}
@@ -164,7 +164,7 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 					//generate new calender amd upload to storage
 					var calendar = GenerateCalender(dueDateParsed, locale, dueDateHash,market);
 
-					this.storageClient.UploadCalendar(calendar, locale,dueDateHash);
+					//this.storageClient.UploadCalendar(calendar, locale,dueDateHash);
 
 					//add to db
 
@@ -375,7 +375,7 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 						this.unitOfWork.GetRepository<Data.Models.Calendar>()
 							.ExecuteNonQueryStoredProcedure(Constant.DatabaseObject.StoredProcedure.DeleteCalendar,
 								argsDeleteCalendar);
-						this.storageClient.DeleteCalendar($"{calendar.DueDateHash}", market.Language);
+						//this.storageClient.DeleteCalendar($"{calendar.DueDateHash}", market.Language);
 						this.logger.LogInformation(
 							$"Batch deleted one obsolete Calendar on DB and Azure storage: {calendar.DueDateHash} for market {market.Language}");
 						//remove
@@ -402,8 +402,8 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 							var newCalender = GenerateCalender(calendar.DueDate, market.Language, calendar.DueDateHash,market);
 							//listOfGeneratedCals.Add(newCalender);
 							//listOfCalsToDel.Add(newCalender.Name);
-							this.storageClient.DeleteCalendar($"{calendar.DueDateHash}", market.Language);
-							this.storageClient.UploadCalendar(newCalender, market.Language, calendar.DueDateHash);
+							//this.storageClient.DeleteCalendar($"{calendar.DueDateHash}", market.Language);
+							///this.storageClient.UploadCalendar(newCalender, market.Language, calendar.DueDateHash);
 							//update db
 
 							AddOrUpdateCalendar<Data.Models.Calendar>(new Data.Models.Calendar()
