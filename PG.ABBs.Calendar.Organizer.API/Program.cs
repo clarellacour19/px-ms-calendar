@@ -16,7 +16,7 @@ if (config["KeyVault:Vault"] != null
     && config["KeyVault:ClientId"] != null
     && config["KeyVault:ClientSecret"] != null)
 {
-	//config.AddAzureKeyVault(config["KeyVault:Vault"], config["KeyVault:ClientId"], config["KeyVault:ClientSecret"]);
+	config.AddAzureKeyVault(config["KeyVault:Vault"], config["KeyVault:ClientId"], config["KeyVault:ClientSecret"]);
 }
 
 var _authority = config[Constants.Authority];
@@ -64,11 +64,10 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 
 
-if (app.Environment.IsDevelopment() /*|| app.Environment.IsStaging()*/)
+if (app.Environment.IsDevelopment() || app.Environment.IsStaging())
 {
 	Trace.TraceInformation($"Using {app.Environment.EnvironmentName} Environment");
 	app.UseDeveloperExceptionPage();
-	//app.UseHsts();
 }
 else
 {
