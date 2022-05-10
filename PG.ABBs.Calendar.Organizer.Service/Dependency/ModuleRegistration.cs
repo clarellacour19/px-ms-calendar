@@ -43,32 +43,32 @@ namespace PG.ABBs.Calendar.Organizer.Service.Dependency
 			    && configuration["KeyVault:ClientId"] != null
 			    && configuration["KeyVault:ClientSecret"] != null)
 			{
-				if (isDevelopment)
-				{
-					services.AddDbContextPool<DataContext>(options =>
-						options.UseSqlServer(configuration[Constant.ConnectionString]));
-				}
-				else
-				{
-					services.AddDbContextPool<DataContext>(options =>
-						options.UseSqlServer(configuration[Constant.KeyVaultConnectionString]));
-				}
+				//if (isDevelopment)
+				//{
+				//	services.AddDbContextPool<DataContext>(options =>
+				//		options.UseSqlServer(configuration[Constant.ConnectionString]));
+				//}
+				//else
+				//{
+				//	services.AddDbContextPool<DataContext>(options =>
+				//		options.UseSqlServer(configuration[Constant.KeyVaultConnectionString]));
+				//}
 
-				services.PostConfigure<List<MarketSettings>>(marketOptions =>
-				{
-					foreach (var market in marketOptions)
-					{
-						market.PreviewApiKey = configuration[$"{Constant.KeyVaultPreviewApiKey}-{market.SpaceId}"];
-						market.DeliveryApiKey = configuration[$"{Constant.KeyVaultDeliveryApiKey}-{market.SpaceId}"];
-						market.ManagementApiKey = configuration[Constant.KeyVaultManagementApiKey];
-					}
-				});
+				//services.PostConfigure<List<MarketSettings>>(marketOptions =>
+				//{
+				//	foreach (var market in marketOptions)
+				//	{
+				//		market.PreviewApiKey = configuration[$"{Constant.KeyVaultPreviewApiKey}-{market.SpaceId}"];
+				//		market.DeliveryApiKey = configuration[$"{Constant.KeyVaultDeliveryApiKey}-{market.SpaceId}"];
+				//		market.ManagementApiKey = configuration[Constant.KeyVaultManagementApiKey];
+				//	}
+				//});
 
 
-				services.PostConfigure<StorageModel>(model =>
-				{
-					model.ConnectionString = configuration[Constant.KeyVaultStorageConnectionString];
-				});
+				//services.PostConfigure<StorageModel>(model =>
+				//{
+				//	model.ConnectionString = configuration[Constant.KeyVaultStorageConnectionString];
+				//});
 			}
 			else
 			{
