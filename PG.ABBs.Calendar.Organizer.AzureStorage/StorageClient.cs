@@ -95,7 +95,7 @@ namespace PG.ABBs.Calendar.Organizer.AzureStorage
 				string serializedCalendar = iCalSerializer.SerializeToString(CalendarName);
 				var bytesCalendar = Encoding.ASCII.GetBytes(serializedCalendar);
 
-				var blockBlob = container.GetBlobClient(Path.Combine($"px-calender-np/{market}/{duedateHash}.ics"));
+				var blockBlob = container.GetBlobClient(Path.Combine($"{azureStorage.Value.EnvironmentName}/{market}/{duedateHash}.ics"));
 
 				using (MemoryStream memoryStream = new MemoryStream(bytesCalendar))
 				{
@@ -138,7 +138,7 @@ namespace PG.ABBs.Calendar.Organizer.AzureStorage
 			{
 				if (!CalendarName.Equals(null))
 				{
-					var blob = container.GetBlobClient($"px-calender-np/{market}/{CalendarName}.ics");
+					var blob = container.GetBlobClient($"{azureStorage.Value.EnvironmentName}/{market}/{CalendarName}.ics");
 					if (blob.ExistsAsync().Result)
 					{
 						blob.DeleteAsync();

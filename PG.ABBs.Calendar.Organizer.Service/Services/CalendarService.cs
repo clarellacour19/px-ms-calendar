@@ -185,7 +185,7 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 						DueDateHash = dueDateHash,
 						DateCreated = DateTime.UtcNow,
 						Locale = locale,
-						CdnUrl = $"{azureStorage.Value.CdnPrefix}/{market.Language}/{dueDateHash}"
+						CdnUrl = $"{azureStorage.Value.CdnPrefix}/{market.Language}/{dueDateHash}.ics"
 
 					};
 
@@ -212,7 +212,7 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 						DueDateHash = dueDateHash,
 						DateCreated = DateTime.UtcNow,
 						Locale = locale,
-						CdnUrl = $"{azureStorage.Value.CdnPrefix}/{market.Language}/{dueDateHash}"
+						CdnUrl = $"{azureStorage.Value.CdnPrefix}/{market.Language}/{dueDateHash}.ics"
 
 					};
 				}
@@ -274,7 +274,7 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 						DueDate = item.DueDate,
 						UuidHash = item.UuidHash,
 						DueDateHash = item.DueDateHash,
-						CdnUrl = $"{azureStorage.Value.CdnPrefix}/{market.First().Language}/{item.DueDateHash}",
+						CdnUrl = $"{azureStorage.Value.CdnPrefix}/{market.First().Language}/{item.DueDateHash}.ics",
 						Locale = item.Locale
 					});
 				}
