@@ -364,7 +364,7 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 				for (int i = 0; i < fullListOfCalendars.Count; i++)
 				{
 					var calendar = fullListOfCalendars[i];
-					if (DateTime.UtcNow - calendar.DateCreated > span)
+					if (DateTime.UtcNow - calendar.DueDate > span)
 					{
 						var argsDeleteCalendar = new Dictionary<string, object>
 						{
