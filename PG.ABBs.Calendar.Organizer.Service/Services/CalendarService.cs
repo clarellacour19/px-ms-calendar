@@ -557,7 +557,7 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 					Summary = events.Title,
 					Description = events.Description,
 					Start = date,
-					IsAllDay = true,
+					IsAllDay = false,
 					Location = events.URL,
 					Alarms =
 					{

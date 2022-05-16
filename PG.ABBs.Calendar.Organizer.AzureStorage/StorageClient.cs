@@ -93,19 +93,28 @@ namespace PG.ABBs.Calendar.Organizer.AzureStorage
 			{
 				var iCalSerializer = new CalendarSerializer();
 				string serializedCalendar = iCalSerializer.SerializeToString(CalendarName);
-				var bytesCalendar = Encoding.ASCII.GetBytes(serializedCalendar);
+				
+				var bytesCalendar = Encoding.UTF8.GetBytes(serializedCalendar);
 
 				var blockBlob = container.GetBlobClient(Path.Combine($"{azureStorage.Value.EnvironmentName}/{market}/{duedateHash}.ics"));
 
 				using (MemoryStream memoryStream = new MemoryStream(bytesCalendar))
 				{
-					blockBlob.UploadAsync(memoryStream);
+					//blockBlob.UploadAsync(memoryStream);
+					var response = blockBlob.Upload(memoryStream);
+					
+
+					if (!response.GetRawResponse().Status.ToString().Equals("201"))
+					{
+						Console.WriteLine($"The Response from azure is {response}");
+						//add to log
+					}
 				}
 			}
 			catch (Exception e)
 			{
 				Console.WriteLine(e);
-				throw;
+				//throw;
 			}
 		}
 
