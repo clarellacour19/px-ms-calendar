@@ -64,9 +64,11 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 
 
-if (app.Environment.IsDevelopment() || app.Environment.IsStaging())
+if (app.Environment.IsDevelopment())
 {
 	Trace.TraceInformation($"Using {app.Environment.EnvironmentName} Environment");
+	app.UseSwagger().UseSwaggerUI(c => { c.SwaggerEndpoint($"/swagger/v1/swagger.json", "Calendar Organizer WebAPI V1"); });
+
 	app.UseDeveloperExceptionPage();
 }
 else
@@ -81,7 +83,6 @@ app.UseCors(x => x
 	.AllowAnyHeader());
 
 app.UseHttpsRedirection();
-app.UseSwagger().UseSwaggerUI(c => { c.SwaggerEndpoint($"/swagger/v1/swagger.json", "HrefLangJob WebAPI V1"); });
 
 
 app.Use(async (context, next) =>

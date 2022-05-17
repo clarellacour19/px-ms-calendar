@@ -68,7 +68,7 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 			string site, locale = null;
 			if (!ReferenceEquals(Dto, null))
 			{
-				site = Dto.site;
+				
 				locale = Dto.locale;
 			}
 
@@ -134,7 +134,6 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 			}
 			else
 			{
-				site = Dto.site;
 				locale = Dto.locale;
 				uuidHash = Dto.uuidHash;
 				dueDate = Dto.dueDate;
@@ -242,7 +241,6 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 			}
 			else
 			{
-				site = Dto.site;
 				locale = Dto.locale;
 				uuidHash = Dto.uuidHash;
 				sorting = Dto.sorting;
