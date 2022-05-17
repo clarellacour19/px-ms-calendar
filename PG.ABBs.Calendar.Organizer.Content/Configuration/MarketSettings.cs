@@ -33,5 +33,6 @@ namespace PG.ABBs.Calendar.Organizer.Content.Configuration
 		public int DeleteTimeSpan { get; set; }
 		// string CdnPrefix { get; set; }
 		public string TimeZone { get; set; }
+		public int? StartTime { get; set; }
 	}
 }

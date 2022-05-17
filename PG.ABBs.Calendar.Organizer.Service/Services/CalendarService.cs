@@ -489,6 +489,7 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 
 			calendar.Name = "VCALENDAR";//dueDateHash.ToString();
 			calendar.Properties.Add(new CalendarProperty("X-WR-CALNAME", "Pampers Calendar"));
+			calendar.Properties.Add(new CalendarProperty("NAME", "Pampers prenatal Calendar"));
 			calendar.Version = "2.0";
 			calendar.ProductId = $"-//{market.DomainName}//Calendar Organizer 1.0//EN";
 			calendar.AddTimeZone($"{market.TimeZone}");
@@ -543,11 +544,10 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 				int year, month, day, hour, minute, second;
 				Int32.TryParse(startTime.Year.ToString(), out year);
 				Int32.TryParse(startTime.Month.ToString(), out month);
-				Int32.TryParse(startTime.Day.ToString(), out day);
-				Int32.TryParse(startTime.Hour.ToString(), out hour);
+				Int32.TryParse(startTime.Day.ToString(), out day); ;
 				Int32.TryParse(startTime.Minute.ToString(), out minute);
 				Int32.TryParse(startTime.Second.ToString(), out second);
-				var date = new CalDateTime(year, month, day, hour, minute, second);
+				var date = new CalDateTime(year, month, day, market.StartTime??12, minute, second);
 				var iCalEvent = new Ical.Net.CalendarComponents.CalendarEvent
 				{	
 					DtStamp = new CalDateTime(DateTime.UtcNow),
@@ -555,7 +555,7 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 					DtStart = date,
 					DtEnd = date,
 					Summary = events.Title,
-					Description = events.Description,
+					Description = $"{events.Description}\n\n{events.URL}",//events.Description,
 					Start = date,
 					IsAllDay = false,
 					Location = events.URL,
