@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using System.Diagnostics;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PG.ABBs.Calendar.Organizer.Service.Dto;
@@ -46,10 +47,11 @@ namespace PG.ABBs.Calendar.Organizer.API.Controllers
 		[HttpPost]
 		[Route("GenerateCalendar")]
 		public IActionResult GenerateCalendar([FromBody] GenerateCalendarDto Dto)
-		{
+		{	
 			var apiResponse = new ApiResponse();
 			try
 			{
+				Trace.WriteLine($"Generate Method Step 1 at {DateTime.UtcNow.ToString()}");
 				var fromObject = this.calendarService.GenerateCalendar(Dto);
 				apiResponse.UpdateResult(Constants.ErrorCodes.Ok, fromObject);
 			}
@@ -70,6 +72,8 @@ namespace PG.ABBs.Calendar.Organizer.API.Controllers
 			var apiResponse = new ApiResponse();
 			try
 			{
+				Trace.WriteLine($"GetUserCalendar Method Step 1 at {DateTime.UtcNow.ToString()}");
+
 				var fromObject = this.calendarService.GetUserCalendar(Dto);
 				apiResponse.UpdateResult(Constants.ErrorCodes.Ok, fromObject);
 			}

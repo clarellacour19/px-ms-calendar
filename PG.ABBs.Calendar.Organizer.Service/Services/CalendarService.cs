@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -141,10 +142,15 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 
 			try
 			{
+				Trace.WriteLine($"Generate Method Step 2 at {DateTime.UtcNow.ToString()}");
 				var dueDateHash = OrganizerHelper.CreateMD5(dueDate.ToString());
+				Trace.WriteLine($"Generate Method Step 3 at {DateTime.UtcNow.ToString()}");
+
 				var dueDateParsed = new DateTime();
 				DateTime.TryParse(dueDate, out dueDateParsed);
 				var market = marketSettings.Value.Where(m => m.Language.Equals(locale)).First();
+				Trace.WriteLine($"Generate Method Step 3 at {DateTime.UtcNow.ToString()}");
+
 				CalendarDto calendarObj = new CalendarDto();
 
 				var argsToGetDueDateHash = new Dictionary<string, object>
@@ -158,12 +164,17 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 				var listOfCalendars = this.unitOfWork.GetRepository<Data.Models.Calendar>()
 					.ExecuteStoredProcedure(Constant.DatabaseObject.StoredProcedure.GetCalendars,
 						argsToGetDueDateHash); //LOCALE
+				Trace.WriteLine($"Generate Method Step 4 at {DateTime.UtcNow.ToString()}");
+
 				if (!listOfCalendars.Any())
 				{
 					//generate new calender amd upload to storage
 					var calendar = GenerateCalender(dueDateParsed, locale, dueDateHash,market);
+					Trace.WriteLine($"Generate Method Step 5 at {DateTime.UtcNow.ToString()}");
 
 					this.storageClient.UploadCalendar(calendar, locale,dueDateHash);
+					Trace.WriteLine($"Generate Method Step 6 at {DateTime.UtcNow.ToString()}");
+
 
 					//add to db
 
@@ -188,6 +199,8 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 
 					};
 
+					Trace.WriteLine($"Generate Method Step 7 at {DateTime.UtcNow.ToString()}");
+
 				}
 				else
 				{
@@ -202,6 +215,8 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 
 					this.unitOfWork.GetRepository<UserCalendar>().ExecuteNonQueryStoredProcedure(
 						Constant.DatabaseObject.StoredProcedure.AddOrUpdateUserCalendar, argsToAddUserCalender);
+					Trace.WriteLine($"Generate Method Step 8 at {DateTime.UtcNow.ToString()}");
+
 
 					calendarObj = new CalendarDto
 					{
@@ -250,6 +265,7 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 			try
 			{
 				var market = marketSettings.Value.Where(m => m.Language.Equals(locale));
+				Trace.WriteLine($"GetUserCalendar Method Step 2 at {DateTime.UtcNow.ToString()}");
 				var argsToGetDueDateHash = new Dictionary<string, object>
 				{
 					{ "locale", locale },
@@ -259,8 +275,8 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 				};
 				var listOfCalendars = this.unitOfWork.GetRepository<Data.Models.Calendar>()
 					.ExecuteStoredProcedure(Constant.DatabaseObject.StoredProcedure.GetUserCalendars,
-						argsToGetDueDateHash).ToList(); //TO UPDATE
-
+						argsToGetDueDateHash).ToList(); 
+				Trace.WriteLine($"GetUserCalendar Method Step 3 at {DateTime.UtcNow.ToString()}");
 				var calendarDto = new List<CalendarDto>();
 
 				foreach (var item in listOfCalendars)
@@ -277,11 +293,12 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 					});
 				}
 
+				Trace.WriteLine($"GetUserCalendar Method Step 4 at {DateTime.UtcNow.ToString()}");
 				var returnGetUserCalendarDto = new ReturnGetUserCalendarDto
 				{
 					Calendar = calendarDto
 				};
-
+				Trace.WriteLine($"GetUserCalendar Method Step 5 at {DateTime.UtcNow.ToString()}");
 				return returnGetUserCalendarDto;
 			}
 			catch (System.Exception ex)
