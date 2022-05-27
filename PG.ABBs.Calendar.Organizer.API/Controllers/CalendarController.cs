@@ -1,8 +1,10 @@
 ﻿using System.Diagnostics;
+using Microsoft.ApplicationInsights;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PG.ABBs.Calendar.Organizer.Service.Dto;
+using PG.ABBs.Calendar.Organizer.Service.Helper;
 using PG.ABBs.Calendar.Organizer.Service.Services;
 
 namespace PG.ABBs.Calendar.Organizer.API.Controllers
@@ -16,11 +18,13 @@ namespace PG.ABBs.Calendar.Organizer.API.Controllers
 	{
 		private readonly ICalendarService calendarService;
 		private readonly ILogger logger;
+		private readonly TelemetryClient telemetryClient;
 
-		public CalendarController(ICalendarService calendarService, ILogger<CalendarController> loggerProvider)
+		public CalendarController(ICalendarService calendarService, ILogger<CalendarController> loggerProvider, TelemetryClient telemetryClient)
 		{
 			this.calendarService = calendarService;
 			this.logger = loggerProvider;
+			this.telemetryClient = telemetryClient;
 		}
 
 
@@ -51,7 +55,9 @@ namespace PG.ABBs.Calendar.Organizer.API.Controllers
 			var apiResponse = new ApiResponse();
 			try
 			{
-				Trace.WriteLine($"Generate Method Step 1 at {DateTime.UtcNow.ToString()}");
+				var apiName = "GenerateCalendar";
+				var message =$"Generate Method Step 1 at {DateTime.UtcNow.ToString()}";
+				ApplicationInsightsHelper.SendCustomLog(this.telemetryClient,message, apiName, apiName, apiName);
 				var fromObject = this.calendarService.GenerateCalendar(Dto);
 				apiResponse.UpdateResult(Constants.ErrorCodes.Ok, fromObject);
 			}
@@ -72,7 +78,9 @@ namespace PG.ABBs.Calendar.Organizer.API.Controllers
 			var apiResponse = new ApiResponse();
 			try
 			{
-				Trace.WriteLine($"GetUserCalendar Method Step 1 at {DateTime.UtcNow.ToString()}");
+				var apiName = "GetUserCalendar";
+				var message = $"GetUserCalendar Method Step 1 at {DateTime.UtcNow.ToString()}";
+				ApplicationInsightsHelper.SendCustomLog(this.telemetryClient, message, apiName, apiName, apiName);
 
 				var fromObject = this.calendarService.GetUserCalendar(Dto);
 				apiResponse.UpdateResult(Constants.ErrorCodes.Ok, fromObject);
