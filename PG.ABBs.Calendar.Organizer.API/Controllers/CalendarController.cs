@@ -81,7 +81,6 @@ namespace PG.ABBs.Calendar.Organizer.API.Controllers
 			{
 				var apiName = "GetUserCalendar";
 				var message = $"GetUserCalendar Method Step 1 at {DateTime.UtcNow.ToString()}";
-				this.telemetryClient.TrackTrace("Test",SeverityLevel.Warning);
 				ApplicationInsightsHelper.SendCustomLog(this.telemetryClient, message, apiName, apiName, apiName);
 
 				var fromObject = this.calendarService.GetUserCalendar(Dto);

@@ -84,7 +84,7 @@ namespace PG.ABBs.Calendar.Organizer.Service.Helper
         )
         {
 
-	        telemetryClient.TrackTrace(apiName, SeverityLevel.Error,
+	        telemetryClient.TrackTrace(apiName, SeverityLevel.Warning,
 		        new Dictionary<string, string> { { "Message", message}
 			        , { "Source", source }
 			        , { "StackTrace", trace }
