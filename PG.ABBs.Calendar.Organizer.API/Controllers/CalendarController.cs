@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using Microsoft.ApplicationInsights;
+using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -80,6 +81,7 @@ namespace PG.ABBs.Calendar.Organizer.API.Controllers
 			{
 				var apiName = "GetUserCalendar";
 				var message = $"GetUserCalendar Method Step 1 at {DateTime.UtcNow.ToString()}";
+				this.telemetryClient.TrackTrace("Test",SeverityLevel.Warning);
 				ApplicationInsightsHelper.SendCustomLog(this.telemetryClient, message, apiName, apiName, apiName);
 
 				var fromObject = this.calendarService.GetUserCalendar(Dto);
