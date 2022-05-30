@@ -73,6 +73,29 @@ namespace PG.ABBs.Calendar.Organizer.API.Controllers
 		}
 
 		[HttpPost]
+		[Route("TestCalendar")]
+		public IActionResult TestCalendar([FromBody] GenerateCalendarDto Dto)
+		{
+			var apiResponse = new ApiResponse();
+			try
+			{
+				var apiName = "TestCalendar";
+				var message = $"Generate Method Step 1 at {DateTime.UtcNow.ToString()}";
+				ApplicationInsightsHelper.SendCustomLog(this.telemetryClient, message, apiName, apiName, apiName);
+				var fromObject = this.calendarService.GenerateCalendar(Dto);
+				apiResponse.UpdateResult(Constants.ErrorCodes.Ok, fromObject);
+			}
+			catch (Exception ex)
+			{
+				apiResponse.UpdateResultWithException(Constants.ErrorCodes.Failed, ex);
+				this.logger.LogError(
+					$"Error during TestCalendar: {DateTime.UtcNow} - {ex.Message} - {ex.StackTrace}");
+			}
+
+			return this.Json(apiResponse);
+		}
+
+		[HttpPost]
 		[Route("GetUserCalendar")]
 		public IActionResult GetUserCalendar([FromBody] GetUserCalendarDto Dto)
 		{
