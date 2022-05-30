@@ -31,9 +31,16 @@ aiOptions.EnableRequestTrackingTelemetryModule = true;
 aiOptions.EnableDependencyTrackingTelemetryModule = true;
 aiOptions.EnableDiagnosticsTelemetryModule = true;
 services.AddApplicationInsightsTelemetry(aiOptions);
-	
-	
-	
+
+services.AddLogging(loggingBuilder =>
+{
+	loggingBuilder.AddConsole();
+	loggingBuilder.AddDebug();
+	loggingBuilder.AddApplicationInsights();;
+});
+
+
+
 services
 	.AddMvc(opt => opt.EnableEndpointRouting = false).SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
 services.AddMemoryCache();
