@@ -58,6 +58,7 @@ namespace PG.ABBs.Calendar.Organizer.API.Controllers
 			{
 				var apiName = "GenerateCalendar";
 				var message =$"Generate Method Step 1 at {DateTime.UtcNow.ToString()}";
+				_logger.LogInformation(message+"from logger");
 				ApplicationInsightsHelper.SendCustomLog(this.telemetryClient,message, apiName, apiName, apiName);
 				var fromObject = this.calendarService.GenerateCalendar(Dto);
 				apiResponse.UpdateResult(Constants.ErrorCodes.Ok, fromObject);
