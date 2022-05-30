@@ -26,7 +26,14 @@ var _clientID = config[Constants.ClientID];
 
 var aiOptions = new Microsoft.ApplicationInsights.AspNetCore.Extensions.ApplicationInsightsServiceOptions();
 aiOptions.EnableAdaptiveSampling = false;
+aiOptions.EnableActiveTelemetryConfigurationSetup = true;
+aiOptions.EnableRequestTrackingTelemetryModule = true;
+aiOptions.EnableDependencyTrackingTelemetryModule = true;
+aiOptions.EnableDiagnosticsTelemetryModule = true;
 services.AddApplicationInsightsTelemetry(aiOptions);
+	
+	
+	
 services
 	.AddMvc(opt => opt.EnableEndpointRouting = false).SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
 services.AddMemoryCache();
