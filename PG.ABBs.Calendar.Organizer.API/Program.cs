@@ -23,7 +23,10 @@ var _authority = config[Constants.Authority];
 var _audience = config[Constants.Audience];
 var _clientSecret = config[Constants.ClientSecret];
 var _clientID = config[Constants.ClientID];
-services.AddApplicationInsightsTelemetry();
+
+var aiOptions = new Microsoft.ApplicationInsights.AspNetCore.Extensions.ApplicationInsightsServiceOptions();
+aiOptions.EnableAdaptiveSampling = false;
+services.AddApplicationInsightsTelemetry(aiOptions);
 services
 	.AddMvc(opt => opt.EnableEndpointRouting = false).SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
 services.AddMemoryCache();
