@@ -23,8 +23,8 @@ namespace PG.ABBs.Calendar.Organizer.Service.Helper
             )
         {
 
-            stopwatch1.Stop();
-            var metrics = new Dictionary<string, double> { { "processingTime", stopwatch1.Elapsed.TotalMilliseconds } };
+	        stopwatch.Stop();
+            var metrics = new Dictionary<string, double> { { "processingTime", stopwatch.Elapsed.TotalMilliseconds } };
             var properties = new Dictionary<string, string>
             {
                 { "blockName", blockName },
@@ -32,7 +32,7 @@ namespace PG.ABBs.Calendar.Organizer.Service.Helper
                 { "function", function },
             };
             telemetryClient.TrackEvent(apiName, properties, metrics);
-            stopwatch1.Restart();
+            stopwatch.Restart();
         }
 
         public static void SendExceptionTracking(
