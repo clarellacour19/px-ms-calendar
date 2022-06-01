@@ -60,7 +60,7 @@ namespace PG.ABBs.Calendar.Organizer.API.Controllers
 				var message =$"Generate Method Step 1 at {DateTime.UtcNow.ToString()}";
 				this.logger.LogInformation(message+"from logger");
 				//ApplicationInsightsHelper.SendCustomLog(this.telemetryClient,message, apiName, apiName, apiName);
-				ApplicationInsightsHelper.SendEventTracking(this.telemetryClient, apiName, "CalendarController","GenerateCalendar","GenerateCalendar");
+				ApplicationInsightsHelper.SendEventTracking(this.telemetryClient,new Stopwatch(), apiName, "CalendarController","GenerateCalendar","GenerateCalendar");
 				var fromObject = this.calendarService.GenerateCalendar(Dto);
 				apiResponse.UpdateResult(Constants.ErrorCodes.Ok, fromObject);
 			}
@@ -107,7 +107,7 @@ namespace PG.ABBs.Calendar.Organizer.API.Controllers
 				var apiName = "GetUserCalendar";
 				//var message = $"GetUserCalendar Method Step 1 at {DateTime.UtcNow.ToString()}";
 				//ApplicationInsightsHelper.SendCustomLog(this.telemetryClient, message, apiName, apiName, apiName);
-				ApplicationInsightsHelper.SendEventTracking(this.telemetryClient, apiName, "CalendarController", "GetUserCalendar", "GetUserCalendar Step 1");
+				ApplicationInsightsHelper.SendEventTracking(this.telemetryClient, new Stopwatch(), apiName, "CalendarController", "GetUserCalendar", "GetUserCalendar Step 1");
 
 				var fromObject = this.calendarService.GetUserCalendar(Dto);
 				apiResponse.UpdateResult(Constants.ErrorCodes.Ok, fromObject);

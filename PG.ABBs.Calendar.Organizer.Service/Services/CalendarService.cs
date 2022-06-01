@@ -129,6 +129,7 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 
 		public CalendarDto GenerateCalendar(GenerateCalendarDto Dto)
 		{
+			var stopwatch = new Stopwatch();
 			var errorList = new List<String>();
 			string site, locale, uuidHash, dueDate = null;
 			if (ReferenceEquals(Dto, null))
@@ -151,7 +152,7 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 				var dueDateHash = OrganizerHelper.CreateMD5(dueDate.ToString());
 				 //message = new string($"Generate Method Step 3 at {DateTime.UtcNow.ToString()}");
 				//ApplicationInsightsHelper.SendCustomLog(this.telemetryClient, message, apiName, apiName, apiName);
-				ApplicationInsightsHelper.SendEventTracking(this.telemetryClient, apiName, "CalendarService", "GenerateCalendar", "GenerateCalendar Step 3");
+				ApplicationInsightsHelper.SendEventTracking(this.telemetryClient, stopwatch, apiName, "CalendarService", "GenerateCalendar", "GenerateCalendar Step 3");
 
 				var dueDateParsed = new DateTime();
 				DateTime.TryParse(dueDate, out dueDateParsed);
@@ -159,7 +160,7 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 
 				//message = new string($"Generate Method Step 3 at {DateTime.UtcNow.ToString()}");
 				//ApplicationInsightsHelper.SendCustomLog(this.telemetryClient, message, apiName, apiName, apiName);
-				ApplicationInsightsHelper.SendEventTracking(this.telemetryClient, apiName, "CalendarService", "GenerateCalendar", "GenerateCalendar Step 4");
+				ApplicationInsightsHelper.SendEventTracking(this.telemetryClient, stopwatch, apiName, "CalendarService", "GenerateCalendar", "GenerateCalendar Step 4");
 
 				CalendarDto calendarObj = new CalendarDto();
 
@@ -177,7 +178,7 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 
 				//message = new string($"Generate Method Step 4 at {DateTime.UtcNow.ToString()}");
 				//ApplicationInsightsHelper.SendCustomLog(this.telemetryClient, message, apiName, apiName, apiName);
-				ApplicationInsightsHelper.SendEventTracking(this.telemetryClient, apiName, "CalendarService", "GenerateCalendar", "GenerateCalendar Step 5");
+				ApplicationInsightsHelper.SendEventTracking(this.telemetryClient, stopwatch, apiName, "CalendarService", "GenerateCalendar", "GenerateCalendar Step 5");
 
 				if (!listOfCalendars.Any())
 				{
@@ -186,13 +187,13 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 
 					//message = new string($"Generate Method Step 5 at {DateTime.UtcNow.ToString()}");
 					//ApplicationInsightsHelper.SendCustomLog(this.telemetryClient, message, apiName, apiName, apiName);
-					ApplicationInsightsHelper.SendEventTracking(this.telemetryClient, apiName, "CalendarService", "GenerateCalendar", "GenerateCalendar Step 6");
+					ApplicationInsightsHelper.SendEventTracking(this.telemetryClient, stopwatch, apiName, "CalendarService", "GenerateCalendar", "GenerateCalendar Step 6");
 
 					this.storageClient.UploadCalendar(calendar, locale,dueDateHash);
 
 					//message = new string($"Generate Method Step 6 at {DateTime.UtcNow.ToString()}");
 					//ApplicationInsightsHelper.SendCustomLog(this.telemetryClient, message, apiName, apiName, apiName);
-					ApplicationInsightsHelper.SendEventTracking(this.telemetryClient, apiName, "CalendarService", "GenerateCalendar", "GenerateCalendar Step 7");
+					ApplicationInsightsHelper.SendEventTracking(this.telemetryClient, stopwatch, apiName, "CalendarService", "GenerateCalendar", "GenerateCalendar Step 7");
 
 					//add to db
 
@@ -219,7 +220,8 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 
 					//message = new string($"Generate Method Step 7 at {DateTime.UtcNow.ToString()}");
 					//ApplicationInsightsHelper.SendCustomLog(this.telemetryClient, message, apiName, apiName, apiName);
-					ApplicationInsightsHelper.SendEventTracking(this.telemetryClient, apiName, "CalendarService", "GenerateCalendar", "GenerateCalendar Step 8");
+					ApplicationInsightsHelper.SendEventTracking(this.telemetryClient, stopwatch, apiName, "CalendarService", "GenerateCalendar", "GenerateCalendar Step 8");
+
 
 				}
 				else
@@ -238,7 +240,7 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 
 					//message = new string($"Generate Method Step 8 at {DateTime.UtcNow.ToString()}");
 					//ApplicationInsightsHelper.SendCustomLog(this.telemetryClient, message, apiName, apiName, apiName);
-					ApplicationInsightsHelper.SendEventTracking(this.telemetryClient, apiName, "CalendarService", "GenerateCalendar", "GenerateCalendar Step 9");
+					ApplicationInsightsHelper.SendEventTracking(this.telemetryClient, stopwatch, apiName, "CalendarService", "GenerateCalendar", "GenerateCalendar Step 9");
 
 
 					calendarObj = new CalendarDto
@@ -271,6 +273,7 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 		{
 			string site, locale, uuidHash, sorting = null;
 			int? limit;
+			var stopwatch = new Stopwatch();
 
 			if (ReferenceEquals(Dto, null))
 			{
@@ -293,7 +296,7 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 
 				//var message = new string($"GetUserCalendar Method Step 2 at {DateTime.UtcNow.ToString()}");
 				//ApplicationInsightsHelper.SendCustomLog(this.telemetryClient, message, apiName, apiName, apiName);
-				ApplicationInsightsHelper.SendEventTracking(this.telemetryClient, apiName, "CalendarService", "GetUserCalendar", "GetUserCalendar Step 2");
+				ApplicationInsightsHelper.SendEventTracking(this.telemetryClient, stopwatch, apiName, "CalendarService", "GetUserCalendar", "GetUserCalendar Step 2");
 
 
 
@@ -309,7 +312,7 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 						argsToGetDueDateHash).ToList();
 				//message = new string($"GetUserCalendar Method Step 3 at {DateTime.UtcNow.ToString()}");
 				//ApplicationInsightsHelper.SendCustomLog(this.telemetryClient, message, apiName, apiName, apiName);
-				ApplicationInsightsHelper.SendEventTracking(this.telemetryClient, apiName, "CalendarService", "GetUserCalendar", "GetUserCalendar Step 3");
+				ApplicationInsightsHelper.SendEventTracking(this.telemetryClient, stopwatch, apiName, "CalendarService", "GetUserCalendar", "GetUserCalendar Step 3");
 
 
 				var calendarDto = new List<CalendarDto>();
@@ -330,7 +333,7 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 
 				//message = new string($"GetUserCalendar Method Step 4 at {DateTime.UtcNow.ToString()}");
 				//ApplicationInsightsHelper.SendCustomLog(this.telemetryClient, message, apiName, apiName, apiName);
-				ApplicationInsightsHelper.SendEventTracking(this.telemetryClient, apiName, "CalendarService", "GetUserCalendar", "GetUserCalendar Step 4");
+				ApplicationInsightsHelper.SendEventTracking(this.telemetryClient, stopwatch, apiName, "CalendarService", "GetUserCalendar", "GetUserCalendar Step 4");
 
 
 				var returnGetUserCalendarDto = new ReturnGetUserCalendarDto
@@ -339,7 +342,7 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 				};
 				//message = new string($"GetUserCalendar Method Step 5 at {DateTime.UtcNow.ToString()}");
 				//ApplicationInsightsHelper.SendCustomLog(this.telemetryClient, message, apiName, apiName, apiName);
-				ApplicationInsightsHelper.SendEventTracking(this.telemetryClient, apiName, "CalendarService", "GetUserCalendar", "GetUserCalendar Step 5");
+				ApplicationInsightsHelper.SendEventTracking(this.telemetryClient, stopwatch, apiName, "CalendarService", "GetUserCalendar", "GetUserCalendar Step 5");
 
 
 				return returnGetUserCalendarDto;
