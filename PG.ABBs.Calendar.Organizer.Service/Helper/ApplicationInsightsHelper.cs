@@ -15,7 +15,7 @@ namespace PG.ABBs.Calendar.Organizer.Service.Helper
         public static Stopwatch stopwatch1 { get; set; }
         public static void SendEventTracking(
             TelemetryClient telemetryClient,
-            Stopwatch stopwatch,
+           // Stopwatch stopwatch,
             string apiName,
             string className,
             string function,
