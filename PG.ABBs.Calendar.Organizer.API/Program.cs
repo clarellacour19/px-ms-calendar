@@ -23,7 +23,24 @@ var _authority = config[Constants.Authority];
 var _audience = config[Constants.Audience];
 var _clientSecret = config[Constants.ClientSecret];
 var _clientID = config[Constants.ClientID];
-services.AddApplicationInsightsTelemetry();
+
+var aiOptions = new Microsoft.ApplicationInsights.AspNetCore.Extensions.ApplicationInsightsServiceOptions();
+aiOptions.EnableAdaptiveSampling = false;
+aiOptions.EnableActiveTelemetryConfigurationSetup = true;
+aiOptions.EnableRequestTrackingTelemetryModule = true;
+aiOptions.EnableDependencyTrackingTelemetryModule = true;
+aiOptions.EnableDiagnosticsTelemetryModule = true;
+services.AddApplicationInsightsTelemetry(aiOptions);
+
+services.AddLogging(loggingBuilder =>
+{
+	loggingBuilder.AddConsole();
+	loggingBuilder.AddDebug();
+	loggingBuilder.AddApplicationInsights();;
+});
+
+
+
 services
 	.AddMvc(opt => opt.EnableEndpointRouting = false).SetCompatibilityVersion(CompatibilityVersion.Version_3_0);
 services.AddMemoryCache();
@@ -64,11 +81,12 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 
 
-if (app.Environment.IsDevelopment() /*|| app.Environment.IsStaging()*/)
+if (app.Environment.IsDevelopment())
 {
 	Trace.TraceInformation($"Using {app.Environment.EnvironmentName} Environment");
+	app.UseSwagger().UseSwaggerUI(c => { c.SwaggerEndpoint($"/swagger/v1/swagger.json", "Calendar Organizer WebAPI V1"); });
+
 	app.UseDeveloperExceptionPage();
-	//app.UseHsts();
 }
 else
 {
@@ -82,7 +100,6 @@ app.UseCors(x => x
 	.AllowAnyHeader());
 
 app.UseHttpsRedirection();
-app.UseSwagger().UseSwaggerUI(c => { c.SwaggerEndpoint($"/swagger/v1/swagger.json", "HrefLangJob WebAPI V1"); });
 
 
 app.Use(async (context, next) =>

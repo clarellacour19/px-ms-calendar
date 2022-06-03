@@ -8,7 +8,7 @@ namespace PG.ABBs.Calendar.Organizer.Service.Dto
 {
 	public class BatchUpdateCalendarDto
 	{
-		public string site { get; set; }
+		
 		public string locale { get; set; }
 	}
 }

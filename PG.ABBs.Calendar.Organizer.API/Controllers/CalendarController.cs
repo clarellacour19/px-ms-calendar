@@ -1,7 +1,11 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using System.Diagnostics;
+using Microsoft.ApplicationInsights;
+using Microsoft.ApplicationInsights.DataContracts;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PG.ABBs.Calendar.Organizer.Service.Dto;
+using PG.ABBs.Calendar.Organizer.Service.Helper;
 using PG.ABBs.Calendar.Organizer.Service.Services;
 
 namespace PG.ABBs.Calendar.Organizer.API.Controllers
@@ -15,11 +19,13 @@ namespace PG.ABBs.Calendar.Organizer.API.Controllers
 	{
 		private readonly ICalendarService calendarService;
 		private readonly ILogger logger;
+		private readonly TelemetryClient telemetryClient;
 
-		public CalendarController(ICalendarService calendarService, ILogger<CalendarController> loggerProvider)
+		public CalendarController(ICalendarService calendarService, ILogger<CalendarController> loggerProvider, TelemetryClient telemetryClient)
 		{
 			this.calendarService = calendarService;
 			this.logger = loggerProvider;
+			this.telemetryClient = telemetryClient;
 		}
 
 
@@ -30,7 +36,7 @@ namespace PG.ABBs.Calendar.Organizer.API.Controllers
 			var apiResponse = new ApiResponse();
 			try
 			{
-				Response.OnCompleted(async () => { await this.calendarService.BatchUpdateCalendar(Dto); });
+				Response.OnCompleted(async () => { await this.calendarService.BatchUpdateCalendar(Dto).ConfigureAwait(false); });
 				apiResponse.UpdateResult(Constants.ErrorCodes.Ok, null);
 			}
 			catch (Exception ex)
@@ -45,12 +51,18 @@ namespace PG.ABBs.Calendar.Organizer.API.Controllers
 
 		[HttpPost]
 		[Route("GenerateCalendar")]
-		public IActionResult GenerateCalendar([FromBody] GenerateCalendarDto Dto)
-		{
+		public async Task<IActionResult> GenerateCalendar([FromBody] GenerateCalendarDto Dto)
+		{	
 			var apiResponse = new ApiResponse();
 			try
 			{
-				var fromObject = this.calendarService.GenerateCalendar(Dto);
+				var stopwatch = new Stopwatch();
+				var apiName = "GenerateCalendar";
+				var message =$"Generate Method Step 1 at {DateTime.UtcNow.ToString()}";
+				this.logger.LogInformation(message+"from logger");
+				//ApplicationInsightsHelper.SendCustomLog(this.telemetryClient,message, apiName, apiName, apiName);
+				ApplicationInsightsHelper.SendEventTracking(this.telemetryClient, stopwatch, apiName, "CalendarController","GenerateCalendar","GenerateCalendar");
+				var fromObject = await this.calendarService.GenerateCalendar(Dto).ConfigureAwait(false);
 				apiResponse.UpdateResult(Constants.ErrorCodes.Ok, fromObject);
 			}
 			catch (Exception ex)
@@ -64,12 +76,41 @@ namespace PG.ABBs.Calendar.Organizer.API.Controllers
 		}
 
 		[HttpPost]
+		[Route("TestCalendar")]
+		public IActionResult TestCalendar([FromBody] GenerateCalendarDto Dto)
+		{
+			var apiResponse = new ApiResponse();
+			try
+			{
+				var apiName = "TestCalendar";
+				var message = $"Generate Method Step 1 at {DateTime.UtcNow.ToString()}";
+				ApplicationInsightsHelper.SendCustomLog(this.telemetryClient, message, apiName, apiName, apiName);
+				var fromObject = this.calendarService.GenerateCalendar(Dto);
+				apiResponse.UpdateResult(Constants.ErrorCodes.Ok, fromObject);
+			}
+			catch (Exception ex)
+			{
+				apiResponse.UpdateResultWithException(Constants.ErrorCodes.Failed, ex);
+				this.logger.LogError(
+					$"Error during TestCalendar: {DateTime.UtcNow} - {ex.Message} - {ex.StackTrace}");
+			}
+
+			return this.Json(apiResponse);
+		}
+
+		[HttpPost]
 		[Route("GetUserCalendar")]
 		public IActionResult GetUserCalendar([FromBody] GetUserCalendarDto Dto)
 		{
 			var apiResponse = new ApiResponse();
 			try
 			{
+				var stopwatch = new Stopwatch();
+				var apiName = "GetUserCalendar";
+				//var message = $"GetUserCalendar Method Step 1 at {DateTime.UtcNow.ToString()}";
+				//ApplicationInsightsHelper.SendCustomLog(this.telemetryClient, message, apiName, apiName, apiName);
+				ApplicationInsightsHelper.SendEventTracking(this.telemetryClient, stopwatch, apiName, "CalendarController", "GetUserCalendar", "GetUserCalendar Step 1");
+
 				var fromObject = this.calendarService.GetUserCalendar(Dto);
 				apiResponse.UpdateResult(Constants.ErrorCodes.Ok, fromObject);
 			}

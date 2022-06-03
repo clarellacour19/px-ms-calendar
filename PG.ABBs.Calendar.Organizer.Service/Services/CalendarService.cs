@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -8,6 +9,7 @@ using Contentful.Core.Extensions;
 using Ical.Net;
 using Ical.Net.CalendarComponents;
 using Ical.Net.DataTypes;
+using Microsoft.ApplicationInsights;
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using Microsoft.EntityFrameworkCore.SqlServer.Query.Internal;
 using Microsoft.Extensions.Logging;
@@ -15,6 +17,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.VisualBasic;
 using NodaTime;
 using PG.ABBs.Calendar.Organizer.AzureStorage;
+using PG.ABBs.Calendar.Organizer.AzureStorage.Model;
 using PG.ABBs.Calendar.Organizer.Content;
 using PG.ABBs.Calendar.Organizer.Content.Configuration;
 using PG.ABBs.Calendar.Organizer.Content.Domain;
@@ -42,7 +45,8 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 
 		private readonly ILogger logger;
 
-		//private readonly StorageClient storageClient;
+		private readonly StorageClient storageClient;
+		private readonly TelemetryClient telemetryClient;
 
 		public CalendarService(
 			IUnitOfWork<DataContext> unitOfWork,
@@ -51,15 +55,16 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 			IOptions<List<MarketSettings>> marketSettings,
 			IOptions<List<string>> contentTypeSettings,
 			MarketSettingsHelper marketSettingsHelper,
-			//StorageClient storageClient,
+			TelemetryClient telemetryClient,
+			StorageClient storageClient,
 			ILogger<CalendarService> loggerProvider)
 		{
 			this.unitOfWork = unitOfWork;
 			this.contentManager = contentManager;
 			this.marketSettings = marketSettings;
 			this.azureStorage = azureStorage;
-			//this.storageClient = storageClient;
-
+			this.storageClient = storageClient;
+			this.telemetryClient = telemetryClient;
 			this.logger = loggerProvider;
 		}
 
@@ -68,7 +73,7 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 			string site, locale = null;
 			if (!ReferenceEquals(Dto, null))
 			{
-				site = Dto.site;
+				
 				locale = Dto.locale;
 			}
 
@@ -123,8 +128,9 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 			return result;
 		}
 
-		public CalendarDto GenerateCalendar(GenerateCalendarDto Dto)
+		public async Task<CalendarDto> GenerateCalendar(GenerateCalendarDto Dto)
 		{
+			var stopwatch = new Stopwatch();
 			var errorList = new List<String>();
 			string site, locale, uuidHash, dueDate = null;
 			if (ReferenceEquals(Dto, null))
@@ -134,7 +140,6 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 			}
 			else
 			{
-				site = Dto.site;
 				locale = Dto.locale;
 				uuidHash = Dto.uuidHash;
 				dueDate = Dto.dueDate;
@@ -142,10 +147,22 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 
 			try
 			{
+				//var message = new string($"Generate Method Step 2 at {DateTime.UtcNow.ToString()}");
+				var apiName = "GenerateCalendar";
+				
 				var dueDateHash = OrganizerHelper.CreateMD5(dueDate.ToString());
+				 //message = new string($"Generate Method Step 3 at {DateTime.UtcNow.ToString()}");
+				//ApplicationInsightsHelper.SendCustomLog(this.telemetryClient, message, apiName, apiName, apiName);
+				ApplicationInsightsHelper.SendEventTracking(this.telemetryClient, stopwatch, apiName, "CalendarService", "GenerateCalendar", "GenerateCalendar Step 3");
+
 				var dueDateParsed = new DateTime();
 				DateTime.TryParse(dueDate, out dueDateParsed);
 				var market = marketSettings.Value.Where(m => m.Language.Equals(locale)).First();
+
+				//message = new string($"Generate Method Step 3 at {DateTime.UtcNow.ToString()}");
+				//ApplicationInsightsHelper.SendCustomLog(this.telemetryClient, message, apiName, apiName, apiName);
+				ApplicationInsightsHelper.SendEventTracking(this.telemetryClient, stopwatch, apiName, "CalendarService", "GenerateCalendar", "GenerateCalendar Step 4");
+
 				CalendarDto calendarObj = new CalendarDto();
 
 				var argsToGetDueDateHash = new Dictionary<string, object>
@@ -159,12 +176,25 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 				var listOfCalendars = this.unitOfWork.GetRepository<Data.Models.Calendar>()
 					.ExecuteStoredProcedure(Constant.DatabaseObject.StoredProcedure.GetCalendars,
 						argsToGetDueDateHash); //LOCALE
+
+				//message = new string($"Generate Method Step 4 at {DateTime.UtcNow.ToString()}");
+				//ApplicationInsightsHelper.SendCustomLog(this.telemetryClient, message, apiName, apiName, apiName);
+				ApplicationInsightsHelper.SendEventTracking(this.telemetryClient, stopwatch, apiName, "CalendarService", "GenerateCalendar", "GenerateCalendar Step 5");
+
 				if (!listOfCalendars.Any())
 				{
 					//generate new calender amd upload to storage
 					var calendar = GenerateCalender(dueDateParsed, locale, dueDateHash,market);
 
-					//this.storageClient.UploadCalendar(calendar, locale,dueDateHash);
+					//message = new string($"Generate Method Step 5 at {DateTime.UtcNow.ToString()}");
+					//ApplicationInsightsHelper.SendCustomLog(this.telemetryClient, message, apiName, apiName, apiName);
+					ApplicationInsightsHelper.SendEventTracking(this.telemetryClient, stopwatch, apiName, "CalendarService", "GenerateCalendar", "GenerateCalendar Step 6");
+
+					await this.storageClient.UploadCalendarAsync(calendar, locale,dueDateHash).ConfigureAwait(false);
+
+					//message = new string($"Generate Method Step 6 at {DateTime.UtcNow.ToString()}");
+					//ApplicationInsightsHelper.SendCustomLog(this.telemetryClient, message, apiName, apiName, apiName);
+					ApplicationInsightsHelper.SendEventTracking(this.telemetryClient, stopwatch, apiName, "CalendarService", "GenerateCalendar", "GenerateCalendar Step 7");
 
 					//add to db
 
@@ -185,9 +215,14 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 						DueDateHash = dueDateHash,
 						DateCreated = DateTime.UtcNow,
 						Locale = locale,
-						CdnUrl = $"{azureStorage.Value.CdnPrefix}/{market.Language}/{dueDateHash}"
+						CdnUrl = $"{azureStorage.Value.CdnPrefix}/{market.Language}/{dueDateHash}.ics"
 
 					};
+
+					//message = new string($"Generate Method Step 7 at {DateTime.UtcNow.ToString()}");
+					//ApplicationInsightsHelper.SendCustomLog(this.telemetryClient, message, apiName, apiName, apiName);
+					ApplicationInsightsHelper.SendEventTracking(this.telemetryClient, stopwatch, apiName, "CalendarService", "GenerateCalendar", "GenerateCalendar Step 8");
+
 
 				}
 				else
@@ -204,6 +239,11 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 					this.unitOfWork.GetRepository<UserCalendar>().ExecuteNonQueryStoredProcedure(
 						Constant.DatabaseObject.StoredProcedure.AddOrUpdateUserCalendar, argsToAddUserCalender);
 
+					//message = new string($"Generate Method Step 8 at {DateTime.UtcNow.ToString()}");
+					//ApplicationInsightsHelper.SendCustomLog(this.telemetryClient, message, apiName, apiName, apiName);
+					ApplicationInsightsHelper.SendEventTracking(this.telemetryClient, stopwatch, apiName, "CalendarService", "GenerateCalendar", "GenerateCalendar Step 9");
+
+
 					calendarObj = new CalendarDto
 					{
 						CalendarId = listOfCalendars.First().CalendarId,
@@ -212,7 +252,7 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 						DueDateHash = dueDateHash,
 						DateCreated = DateTime.UtcNow,
 						Locale = locale,
-						CdnUrl = $"{azureStorage.Value.CdnPrefix}/{market.Language}/{dueDateHash}"
+						CdnUrl = $"{azureStorage.Value.CdnPrefix}/{market.Language}/{dueDateHash}.ics"
 
 					};
 				}
@@ -234,6 +274,7 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 		{
 			string site, locale, uuidHash, sorting = null;
 			int? limit;
+			var stopwatch = new Stopwatch();
 
 			if (ReferenceEquals(Dto, null))
 			{
@@ -242,7 +283,6 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 			}
 			else
 			{
-				site = Dto.site;
 				locale = Dto.locale;
 				uuidHash = Dto.uuidHash;
 				sorting = Dto.sorting;
@@ -251,7 +291,16 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 
 			try
 			{
+				var apiName = "GetUserCalendar";
+
 				var market = marketSettings.Value.Where(m => m.Language.Equals(locale));
+
+				//var message = new string($"GetUserCalendar Method Step 2 at {DateTime.UtcNow.ToString()}");
+				//ApplicationInsightsHelper.SendCustomLog(this.telemetryClient, message, apiName, apiName, apiName);
+				ApplicationInsightsHelper.SendEventTracking(this.telemetryClient, stopwatch, apiName, "CalendarService", "GetUserCalendar", "GetUserCalendar Step 2");
+
+
+
 				var argsToGetDueDateHash = new Dictionary<string, object>
 				{
 					{ "locale", locale },
@@ -261,7 +310,11 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 				};
 				var listOfCalendars = this.unitOfWork.GetRepository<Data.Models.Calendar>()
 					.ExecuteStoredProcedure(Constant.DatabaseObject.StoredProcedure.GetUserCalendars,
-						argsToGetDueDateHash).ToList(); //TO UPDATE
+						argsToGetDueDateHash).ToList();
+				//message = new string($"GetUserCalendar Method Step 3 at {DateTime.UtcNow.ToString()}");
+				//ApplicationInsightsHelper.SendCustomLog(this.telemetryClient, message, apiName, apiName, apiName);
+				ApplicationInsightsHelper.SendEventTracking(this.telemetryClient, stopwatch, apiName, "CalendarService", "GetUserCalendar", "GetUserCalendar Step 3");
+
 
 				var calendarDto = new List<CalendarDto>();
 
@@ -274,15 +327,24 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 						DueDate = item.DueDate,
 						UuidHash = item.UuidHash,
 						DueDateHash = item.DueDateHash,
-						CdnUrl = $"{azureStorage.Value.CdnPrefix}/{market.First().Language}/{item.DueDateHash}",
+						CdnUrl = $"{azureStorage.Value.CdnPrefix}/{market.First().Language}/{item.DueDateHash}.ics",
 						Locale = item.Locale
 					});
 				}
+
+				//message = new string($"GetUserCalendar Method Step 4 at {DateTime.UtcNow.ToString()}");
+				//ApplicationInsightsHelper.SendCustomLog(this.telemetryClient, message, apiName, apiName, apiName);
+				ApplicationInsightsHelper.SendEventTracking(this.telemetryClient, stopwatch, apiName, "CalendarService", "GetUserCalendar", "GetUserCalendar Step 4");
+
 
 				var returnGetUserCalendarDto = new ReturnGetUserCalendarDto
 				{
 					Calendar = calendarDto
 				};
+				//message = new string($"GetUserCalendar Method Step 5 at {DateTime.UtcNow.ToString()}");
+				//ApplicationInsightsHelper.SendCustomLog(this.telemetryClient, message, apiName, apiName, apiName);
+				ApplicationInsightsHelper.SendEventTracking(this.telemetryClient, stopwatch, apiName, "CalendarService", "GetUserCalendar", "GetUserCalendar Step 5");
+
 
 				return returnGetUserCalendarDto;
 			}
@@ -332,6 +394,7 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 								argsToGet);
 						this.logger.LogInformation(
 							$"Batch deleted one obsolete event on DB : {events.ContentId} for market {market.Language}");
+						wasUpdated = true;
 					}
 					else
 					{
@@ -349,9 +412,13 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 				//new events not present in db
 				foreach (var calendarEvent in listOfCalendarEvents)
 				{
-					calendarEvent.Locale = market.Language;
-					AddOrUpdateEvent<Events>(calendarEvent);
-					wasUpdated = true;
+					if (!listOfEventsOnDb.Any(db => db.ContentId.Equals(calendarEvent.Sys.Id)))
+					{
+						calendarEvent.Locale = market.Language;
+						AddOrUpdateEvent<Events>(calendarEvent);
+						wasUpdated = true;
+					}
+					
 				}
 
 
@@ -364,7 +431,7 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 				for (int i = 0; i < fullListOfCalendars.Count; i++)
 				{
 					var calendar = fullListOfCalendars[i];
-					if (DateTime.UtcNow - calendar.DateCreated > span)
+					if (DateTime.UtcNow - calendar.DueDate > span)
 					{
 						var argsDeleteCalendar = new Dictionary<string, object>
 						{
@@ -383,10 +450,19 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 					}
 				}
 
+				#region uploadasync
+
 				//var listOfCalsToDel = new List<string>();
 				//var listOfGeneratedCals = new List<Ical.Net.Calendar>();
 
-				if (wasUpdated)
+				//var listofCalendarsToDelete = new List<DeleteCalendarModel>();
+				//var listOfGeneratedCalendars = new List<GenerateCalendarModel>();
+
+
+				#endregion
+
+
+				if (true)
 				{
 					//get all calendar
 					// run process to generate new ICS
@@ -400,10 +476,23 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 							//GENERATE NEW CALENDER
 
 							var newCalender = GenerateCalender(calendar.DueDate, market.Language, calendar.DueDateHash,market);
-							//listOfGeneratedCals.Add(newCalender);
-							//listOfCalsToDel.Add(newCalender.Name);
-							//this.storageClient.DeleteCalendar($"{calendar.DueDateHash}", market.Language);
-							///this.storageClient.UploadCalendar(newCalender, market.Language, calendar.DueDateHash);
+
+
+							//uploadasync
+							//listOfGeneratedCalendars.Add(new GenerateCalendarModel
+							//{
+							//	Calendar = newCalender,
+							//	DueDateHash = calendar.DueDateHash
+							//});
+							////listofCalendarsToDelete.Add(calendar.DueDateHash, market.Language);
+							//listofCalendarsToDelete.Add(new DeleteCalendarModel
+							//{
+							//	DueDateHash = calendar.DueDateHash,
+							//	Locale = market.Language
+							//});
+
+							this.storageClient.DeleteCalendar($"{calendar.DueDateHash}", market.Language);
+							this.storageClient.UploadCalendar(newCalender, market.Language, calendar.DueDateHash);
 							//update db
 
 							AddOrUpdateCalendar<Data.Models.Calendar>(new Data.Models.Calendar()
@@ -420,11 +509,18 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 					}
 				}
 
-				//upload all async
+				//delete all async
 				//if (listOfCalsToDel.Any())
 				//{
 				//	await this.storageClient.DeleteCalendarAsync(market.Language, listOfCalsToDel);
 				//	this.logger.LogInformation($"Batch Deleted the following Calendars for {listOfCalsToDel.ToArray().ToString()} for market {market.Language}");
+				//}
+
+				//if (listofCalendarsToDelete.Any())
+				//{
+				//	await this.storageClient.DeleteCalendarAsync(market.Language, listofCalendarsToDelete).ConfigureAwait(false);
+				//	this.logger.LogInformation($"Batch Deleted the following Calendars for {listofCalendarsToDelete.ToArray().ToString()} for market {market.Language}");
+				//	//}
 				//}
 
 				////upload all async
@@ -434,6 +530,13 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 				//	this.logger.LogInformation($"Batch Uploaded the following Calendars for {listOfGeneratedCals.ToArray().ToString()} for market {market.Language}");
 
 				//}
+
+				//if (listOfGeneratedCalendars.Any())
+				//{
+				//	await this.storageClient.UploadCalendarsAsync(market.Language, listOfGeneratedCalendars).ConfigureAwait(false);
+				//	this.logger.LogInformation($"Batch Uploaded the following Calendars for {listOfGeneratedCalendars.ToArray().ToString()} for market {market.Language}");
+				//}
+
 				this.logger.LogWarning($"Update Calendar Batch Ended for : {market.Language} at {DateTime.UtcNow}");
 			}
 			catch (System.Exception ex)
@@ -489,6 +592,7 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 
 			calendar.Name = "VCALENDAR";//dueDateHash.ToString();
 			calendar.Properties.Add(new CalendarProperty("X-WR-CALNAME", "Pampers Calendar"));
+			calendar.Properties.Add(new CalendarProperty("NAME", "Pampers prenatal Calendar"));
 			calendar.Version = "2.0";
 			calendar.ProductId = $"-//{market.DomainName}//Calendar Organizer 1.0//EN";
 			calendar.AddTimeZone($"{market.TimeZone}");
@@ -543,11 +647,10 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 				int year, month, day, hour, minute, second;
 				Int32.TryParse(startTime.Year.ToString(), out year);
 				Int32.TryParse(startTime.Month.ToString(), out month);
-				Int32.TryParse(startTime.Day.ToString(), out day);
-				Int32.TryParse(startTime.Hour.ToString(), out hour);
+				Int32.TryParse(startTime.Day.ToString(), out day); ;
 				Int32.TryParse(startTime.Minute.ToString(), out minute);
 				Int32.TryParse(startTime.Second.ToString(), out second);
-				var date = new CalDateTime(year, month, day, hour, minute, second);
+				var date = new CalDateTime(year, month, day, market.StartTime??12, minute, second);
 				var iCalEvent = new Ical.Net.CalendarComponents.CalendarEvent
 				{	
 					DtStamp = new CalDateTime(DateTime.UtcNow),
@@ -555,9 +658,9 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 					DtStart = date,
 					DtEnd = date,
 					Summary = events.Title,
-					Description = events.Description,
+					Description = $"{events.Description}\n\n{events.URL}",//events.Description,
 					Start = date,
-					IsAllDay = true,
+					IsAllDay = false,
 					Location = events.URL,
 					Alarms =
 					{
