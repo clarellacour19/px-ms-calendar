@@ -57,6 +57,7 @@ namespace PG.ABBs.Calendar.Organizer.API.Controllers
 			try
 			{
 				var stopwatch = new Stopwatch();
+				stopwatch.Start();
 				var apiName = "GenerateCalendar";
 				var message =$"Generate Method Step 1 at {DateTime.UtcNow.ToString()}";
 				this.logger.LogInformation(message+"from logger");
@@ -106,6 +107,7 @@ namespace PG.ABBs.Calendar.Organizer.API.Controllers
 			try
 			{
 				var stopwatch = new Stopwatch();
+				stopwatch.Start();
 				var apiName = "GetUserCalendar";
 				//var message = $"GetUserCalendar Method Step 1 at {DateTime.UtcNow.ToString()}";
 				//ApplicationInsightsHelper.SendCustomLog(this.telemetryClient, message, apiName, apiName, apiName);

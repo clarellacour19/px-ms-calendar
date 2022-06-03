@@ -130,6 +130,7 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 		public CalendarDto GenerateCalendar(GenerateCalendarDto Dto)
 		{
 			var stopwatch = new Stopwatch();
+			stopwatch.Start();
 			var errorList = new List<String>();
 			string site, locale, uuidHash, dueDate = null;
 			if (ReferenceEquals(Dto, null))
@@ -274,6 +275,7 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 			string site, locale, uuidHash, sorting = null;
 			int? limit;
 			var stopwatch = new Stopwatch();
+			stopwatch.Start();
 
 			if (ReferenceEquals(Dto, null))
 			{
