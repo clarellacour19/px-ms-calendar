@@ -17,6 +17,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.VisualBasic;
 using NodaTime;
 using PG.ABBs.Calendar.Organizer.AzureStorage;
+using PG.ABBs.Calendar.Organizer.AzureStorage.Model;
 using PG.ABBs.Calendar.Organizer.Content;
 using PG.ABBs.Calendar.Organizer.Content.Configuration;
 using PG.ABBs.Calendar.Organizer.Content.Domain;
@@ -127,7 +128,7 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 			return result;
 		}
 
-		public CalendarDto GenerateCalendar(GenerateCalendarDto Dto)
+		public async Task<CalendarDto> GenerateCalendar(GenerateCalendarDto Dto)
 		{
 			var stopwatch = new Stopwatch();
 			var errorList = new List<String>();
@@ -189,7 +190,7 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 					//ApplicationInsightsHelper.SendCustomLog(this.telemetryClient, message, apiName, apiName, apiName);
 					ApplicationInsightsHelper.SendEventTracking(this.telemetryClient, stopwatch, apiName, "CalendarService", "GenerateCalendar", "GenerateCalendar Step 6");
 
-					this.storageClient.UploadCalendar(calendar, locale,dueDateHash);
+					await this.storageClient.UploadCalendarAsync(calendar, locale,dueDateHash).ConfigureAwait(false);
 
 					//message = new string($"Generate Method Step 6 at {DateTime.UtcNow.ToString()}");
 					//ApplicationInsightsHelper.SendCustomLog(this.telemetryClient, message, apiName, apiName, apiName);
@@ -393,6 +394,7 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 								argsToGet);
 						this.logger.LogInformation(
 							$"Batch deleted one obsolete event on DB : {events.ContentId} for market {market.Language}");
+						wasUpdated = true;
 					}
 					else
 					{
@@ -410,9 +412,13 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 				//new events not present in db
 				foreach (var calendarEvent in listOfCalendarEvents)
 				{
-					calendarEvent.Locale = market.Language;
-					AddOrUpdateEvent<Events>(calendarEvent);
-					wasUpdated = true;
+					if (!listOfEventsOnDb.Any(db => db.ContentId.Equals(calendarEvent.Sys.Id)))
+					{
+						calendarEvent.Locale = market.Language;
+						AddOrUpdateEvent<Events>(calendarEvent);
+						wasUpdated = true;
+					}
+					
 				}
 
 
@@ -444,10 +450,19 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 					}
 				}
 
+				#region uploadasync
+
 				//var listOfCalsToDel = new List<string>();
 				//var listOfGeneratedCals = new List<Ical.Net.Calendar>();
 
-				if (wasUpdated)
+				//var listofCalendarsToDelete = new List<DeleteCalendarModel>();
+				//var listOfGeneratedCalendars = new List<GenerateCalendarModel>();
+
+
+				#endregion
+
+
+				if (true)
 				{
 					//get all calendar
 					// run process to generate new ICS
@@ -461,8 +476,21 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 							//GENERATE NEW CALENDER
 
 							var newCalender = GenerateCalender(calendar.DueDate, market.Language, calendar.DueDateHash,market);
-							//listOfGeneratedCals.Add(newCalender);
-							//listOfCalsToDel.Add(newCalender.Name);
+
+
+							//uploadasync
+							//listOfGeneratedCalendars.Add(new GenerateCalendarModel
+							//{
+							//	Calendar = newCalender,
+							//	DueDateHash = calendar.DueDateHash
+							//});
+							////listofCalendarsToDelete.Add(calendar.DueDateHash, market.Language);
+							//listofCalendarsToDelete.Add(new DeleteCalendarModel
+							//{
+							//	DueDateHash = calendar.DueDateHash,
+							//	Locale = market.Language
+							//});
+
 							this.storageClient.DeleteCalendar($"{calendar.DueDateHash}", market.Language);
 							this.storageClient.UploadCalendar(newCalender, market.Language, calendar.DueDateHash);
 							//update db
@@ -481,11 +509,18 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 					}
 				}
 
-				//upload all async
+				//delete all async
 				//if (listOfCalsToDel.Any())
 				//{
 				//	await this.storageClient.DeleteCalendarAsync(market.Language, listOfCalsToDel);
 				//	this.logger.LogInformation($"Batch Deleted the following Calendars for {listOfCalsToDel.ToArray().ToString()} for market {market.Language}");
+				//}
+
+				//if (listofCalendarsToDelete.Any())
+				//{
+				//	await this.storageClient.DeleteCalendarAsync(market.Language, listofCalendarsToDelete).ConfigureAwait(false);
+				//	this.logger.LogInformation($"Batch Deleted the following Calendars for {listofCalendarsToDelete.ToArray().ToString()} for market {market.Language}");
+				//	//}
 				//}
 
 				////upload all async
@@ -495,6 +530,13 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 				//	this.logger.LogInformation($"Batch Uploaded the following Calendars for {listOfGeneratedCals.ToArray().ToString()} for market {market.Language}");
 
 				//}
+
+				//if (listOfGeneratedCalendars.Any())
+				//{
+				//	await this.storageClient.UploadCalendarsAsync(market.Language, listOfGeneratedCalendars).ConfigureAwait(false);
+				//	this.logger.LogInformation($"Batch Uploaded the following Calendars for {listOfGeneratedCalendars.ToArray().ToString()} for market {market.Language}");
+				//}
+
 				this.logger.LogWarning($"Update Calendar Batch Ended for : {market.Language} at {DateTime.UtcNow}");
 			}
 			catch (System.Exception ex)

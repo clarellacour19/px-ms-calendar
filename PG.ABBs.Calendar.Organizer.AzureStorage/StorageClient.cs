@@ -10,6 +10,7 @@ using Azure.Storage.Blobs.Models;
 using Ical.Net;
 using Ical.Net.Serialization;
 using Microsoft.Extensions.Options;
+using PG.ABBs.Calendar.Organizer.AzureStorage.Model;
 
 namespace PG.ABBs.Calendar.Organizer.AzureStorage
 {
@@ -30,7 +31,7 @@ namespace PG.ABBs.Calendar.Organizer.AzureStorage
 			}
 		}
 
-		public async Task UploadCalendarsAsync(string market, List<Ical.Net.Calendar> listOCalendars)
+		public async Task UploadCalendarsAsync(string market, List<GenerateCalendarModel> listOCalendars)
 		{
 			try
 			{
@@ -54,19 +55,20 @@ namespace PG.ABBs.Calendar.Organizer.AzureStorage
 
 
 				// Iterate through the files
-				foreach (Ical.Net.Calendar calendar in listOCalendars)
+				foreach (var sample in listOCalendars)
 				{
 					var iCalSerializer = new CalendarSerializer();
-					string serializedCalendar = iCalSerializer.SerializeToString(calendar);
+					string serializedCalendar = iCalSerializer.SerializeToString(sample.Calendar);
 					var bytesCalendar = Encoding.ASCII.GetBytes(serializedCalendar);
 
-					BlobClient blob = container.GetBlobClient(Path.Combine($"{market}/{calendar.Name}.ics"));
+					//BlobClient blob = container.GetBlobClient(Path.Combine($"{market}/{calendar.Name}.ics"));
+					BlobClient blob = container.GetBlobClient(Path.Combine($"{azureStorage.Value.EnvironmentName}/{market}/{sample.DueDateHash}.ics"));
 
 
 					using (MemoryStream memoryStream = new MemoryStream(bytesCalendar))
 					{
 						// Add the upload task to the queue
-						tasks.Enqueue(blob.UploadAsync(memoryStream, options));
+						tasks.Enqueue(blob.UploadAsync(memoryStream, true,default));
 					}
 				}
 
@@ -87,6 +89,38 @@ namespace PG.ABBs.Calendar.Organizer.AzureStorage
 			}
 		}
 
+		public async Task UploadCalendarAsync(Ical.Net.Calendar CalendarName, string market, string duedateHash)
+		{
+			try
+			{
+				var iCalSerializer = new CalendarSerializer();
+				string serializedCalendar = iCalSerializer.SerializeToString(CalendarName);
+
+				var bytesCalendar = Encoding.UTF8.GetBytes(serializedCalendar);
+
+				var blockBlob = container.GetBlobClient(Path.Combine($"{azureStorage.Value.EnvironmentName}/{market}/{duedateHash}.ics"));
+
+				using (MemoryStream memoryStream = new MemoryStream(bytesCalendar))
+				{
+					//blockBlob.UploadAsync(memoryStream);
+					var response = await blockBlob.UploadAsync(memoryStream,true,default);
+
+
+					//if (!response.Status.ToString().Equals("201"))
+					//{
+						Console.WriteLine($"The Response from azure is {response}");
+						//add to log
+					//}
+
+					
+				}
+			}
+			catch (Exception e)
+			{
+				Console.WriteLine(e);
+				//throw;
+			}
+		}
 		public void UploadCalendar(Ical.Net.Calendar CalendarName, string market, string duedateHash)
 		{
 			try
@@ -118,14 +152,15 @@ namespace PG.ABBs.Calendar.Organizer.AzureStorage
 			}
 		}
 
-		public async Task DeleteCalendarAsync(string market, List<string> listOfCals)
+		public async Task DeleteCalendarAsync(string market, List<DeleteCalendarModel> listOfCals)
 		{
 			try
 			{
 				var tasks = new Queue<Task<Response>>();
 				foreach (var calenderName in listOfCals)
 				{
-					var blob = container.GetBlobClient($"{market}/{calenderName}.ics");
+					//var blob = container.GetBlobClient($"{market}/{calenderName}.ics");
+					var blob = container.GetBlobClient($"{azureStorage.Value.EnvironmentName}/{market}/{calenderName.DueDateHash}.ics");
 					if (blob.ExistsAsync().Result)
 					{
 						tasks.Enqueue(blob.DeleteAsync());

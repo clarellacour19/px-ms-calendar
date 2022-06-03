@@ -36,7 +36,7 @@ namespace PG.ABBs.Calendar.Organizer.API.Controllers
 			var apiResponse = new ApiResponse();
 			try
 			{
-				Response.OnCompleted(async () => { await this.calendarService.BatchUpdateCalendar(Dto); });
+				Response.OnCompleted(async () => { await this.calendarService.BatchUpdateCalendar(Dto).ConfigureAwait(false); });
 				apiResponse.UpdateResult(Constants.ErrorCodes.Ok, null);
 			}
 			catch (Exception ex)
@@ -51,7 +51,7 @@ namespace PG.ABBs.Calendar.Organizer.API.Controllers
 
 		[HttpPost]
 		[Route("GenerateCalendar")]
-		public IActionResult GenerateCalendar([FromBody] GenerateCalendarDto Dto)
+		public async Task<IActionResult> GenerateCalendar([FromBody] GenerateCalendarDto Dto)
 		{	
 			var apiResponse = new ApiResponse();
 			try
@@ -62,7 +62,7 @@ namespace PG.ABBs.Calendar.Organizer.API.Controllers
 				this.logger.LogInformation(message+"from logger");
 				//ApplicationInsightsHelper.SendCustomLog(this.telemetryClient,message, apiName, apiName, apiName);
 				ApplicationInsightsHelper.SendEventTracking(this.telemetryClient, stopwatch, apiName, "CalendarController","GenerateCalendar","GenerateCalendar");
-				var fromObject = this.calendarService.GenerateCalendar(Dto);
+				var fromObject = await this.calendarService.GenerateCalendar(Dto).ConfigureAwait(false);
 				apiResponse.UpdateResult(Constants.ErrorCodes.Ok, fromObject);
 			}
 			catch (Exception ex)
