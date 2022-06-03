@@ -412,9 +412,12 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 				//new events not present in db
 				foreach (var calendarEvent in listOfCalendarEvents)
 				{
-					calendarEvent.Locale = market.Language;
-					AddOrUpdateEvent<Events>(calendarEvent);
-					wasUpdated = true;
+					if (!listOfEventsOnDb.Any(db => db.ContentId.Equals(calendarEvent.Sys.Id)))
+					{
+						calendarEvent.Locale = market.Language;
+						AddOrUpdateEvent<Events>(calendarEvent);
+						wasUpdated = true;
+					}
 				}
 
 
