@@ -477,3 +477,11 @@ ON Events (ContentId , Locale);
 
 CREATE INDEX UUIDHash_DueDatehash_Locale
 ON usercalendar (uuidhash,DueDateHash , Locale);
+
+
+
+------------
+--Clean up db
+
+Delete from Calendar;
+Delete from UserCalendar;
