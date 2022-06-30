@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 using Contentful.Core.Extensions;
 using Ical.Net;
@@ -12,6 +13,7 @@ using Ical.Net.DataTypes;
 using Microsoft.ApplicationInsights;
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using Microsoft.EntityFrameworkCore.SqlServer.Query.Internal;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.VisualBasic;
@@ -46,6 +48,8 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 
 		private readonly StorageClient storageClient;
 		private readonly TelemetryClient telemetryClient;
+		private readonly string _CRMApi;
+		private readonly string _CRMKey;
 
 		public CalendarService(
 			IUnitOfWork<DataContext> unitOfWork,
@@ -56,7 +60,8 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 			MarketSettingsHelper marketSettingsHelper,
 			TelemetryClient telemetryClient,
 			StorageClient storageClient,
-			ILogger<CalendarService> loggerProvider)
+			ILogger<CalendarService> loggerProvider,
+			IConfiguration configuration)
 		{
 			this.unitOfWork = unitOfWork;
 			this.contentManager = contentManager;
@@ -65,6 +70,9 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 			this.storageClient = storageClient;
 			this.telemetryClient = telemetryClient;
 			this.logger = loggerProvider;
+
+			this._CRMKey = configuration["CRM-Key"];
+			this._CRMApi = configuration["CRM"];
 		}
 
 		public async Task<List<string>> BatchUpdateCalendar(BatchUpdateCalendarDto Dto)
@@ -637,6 +645,32 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 			}
 
 			return calendar;
+		}
+
+		public bool VerifyProfile(string userId, string accessToken, string locale)
+		{
+
+			//create request
+			var apiUrl = this._CRMApi;
+			var client = new HttpClient();
+			var data = new JsonObject();
+
+			data.Add(Constant.AccessToken, accessToken);
+			data.Add(Constant.ConsumerId, userId);
+			data.Add(Constant.Locale, locale);
+
+			var content = new StringContent(data.ToString(), Encoding.UTF8, "application/json");
+
+			client.DefaultRequestHeaders.Add(Constant.OcpSubscriptionKey, this._CRMKey);
+
+			var result = client.PostAsync(apiUrl, content).Result;
+
+			if (!result.IsSuccessStatusCode)
+			{
+				return false;
+			}
+			return true;
+
 		}
 	}
 }

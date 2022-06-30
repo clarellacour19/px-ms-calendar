@@ -56,6 +56,16 @@ namespace PG.ABBs.Calendar.Organizer.API.Controllers
 			var apiResponse = new ApiResponse();
 			try
 			{
+				if (!string.IsNullOrEmpty(Dto.AccessToken)) // to remove when all FE matches call
+				{
+					Dto.AccessToken = Uri.UnescapeDataString(Dto.AccessToken);
+					if (!this.calendarService.VerifyProfile(Dto.ConsumerId, Dto.AccessToken, Dto.locale))
+					{
+						apiResponse.UpdateResult(Constants.ErrorCodes.BadParameters, "access token invalid");
+						this.HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
+						return this.Json(apiResponse);
+					}
+				}
 				var stopwatch = new Stopwatch();
 				stopwatch.Start();
 				var apiName = "GenerateCalendar";
@@ -83,6 +93,16 @@ namespace PG.ABBs.Calendar.Organizer.API.Controllers
 			var apiResponse = new ApiResponse();
 			try
 			{
+				if (!string.IsNullOrEmpty(Dto.AccessToken)) // to remove when all FE matches call
+				{
+					Dto.AccessToken = Uri.UnescapeDataString(Dto.AccessToken);
+					if (!this.calendarService.VerifyProfile(Dto.ConsumerId, Dto.AccessToken, Dto.locale))
+					{
+						apiResponse.UpdateResult(Constants.ErrorCodes.BadParameters, "access token invalid");
+						this.HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
+						return this.Json(apiResponse);
+					}
+				}
 				var apiName = "TestCalendar";
 				var message = $"Generate Method Step 1 at {DateTime.UtcNow.ToString()}";
 				ApplicationInsightsHelper.SendCustomLog(this.telemetryClient, message, apiName, apiName, apiName);
@@ -106,6 +126,16 @@ namespace PG.ABBs.Calendar.Organizer.API.Controllers
 			var apiResponse = new ApiResponse();
 			try
 			{
+				if (!string.IsNullOrEmpty(Dto.AccessToken)) // to remove when all FE matches call
+				{
+					Dto.AccessToken = Uri.UnescapeDataString(Dto.AccessToken);
+					if (!this.calendarService.VerifyProfile(Dto.ConsumerId, Dto.AccessToken, Dto.locale))
+					{
+						apiResponse.UpdateResult(Constants.ErrorCodes.BadParameters, "access token invalid");
+						this.HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
+						return this.Json(apiResponse);
+					}
+				}
 				var stopwatch = new Stopwatch();
 				stopwatch.Start();
 				var apiName = "GetUserCalendar";
