@@ -4,6 +4,7 @@ using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using PG.ABBs.Calendar.Organizer.Service.Dto;
 using PG.ABBs.Calendar.Organizer.Service.Helper;
 using PG.ABBs.Calendar.Organizer.Service.Services;
@@ -20,12 +21,22 @@ namespace PG.ABBs.Calendar.Organizer.API.Controllers
 		private readonly ICalendarService calendarService;
 		private readonly ILogger logger;
 		private readonly TelemetryClient telemetryClient;
+		private readonly List<JanrainProvider> _janrainProviders;
+		private readonly string _encryptionV2Key;
+		private readonly string _ivvar;
 
-		public CalendarController(ICalendarService calendarService, ILogger<CalendarController> loggerProvider, TelemetryClient telemetryClient)
+		public CalendarController(ICalendarService calendarService,
+			ILogger<CalendarController> loggerProvider,
+			TelemetryClient telemetryClient, 
+			IConfiguration configuration,
+			IOptions<List<JanrainProvider>> janrainProviders)
 		{
 			this.calendarService = calendarService;
 			this.logger = loggerProvider;
 			this.telemetryClient = telemetryClient;
+			this._janrainProviders = janrainProviders.Value;
+			this._ivvar = configuration["IvVariable"];
+			this._encryptionV2Key = configuration["EncryptionV2Key"];
 		}
 
 
@@ -51,7 +62,7 @@ namespace PG.ABBs.Calendar.Organizer.API.Controllers
 
 		[HttpPost]
 		[Route("GenerateCalendar")]
-		public IActionResult GenerateCalendar([FromBody] GenerateCalendarDto Dto)
+		public async Task<IActionResult> GenerateCalendar([FromBody] GenerateCalendarDto Dto)
 		{	
 			var apiResponse = new ApiResponse();
 			try
@@ -59,7 +70,12 @@ namespace PG.ABBs.Calendar.Organizer.API.Controllers
 				if (!string.IsNullOrEmpty(Dto.AccessToken)) // to remove when all FE matches call
 				{
 					Dto.AccessToken = Uri.UnescapeDataString(Dto.AccessToken);
-					if (!this.calendarService.VerifyProfile(Dto.ConsumerId, Dto.AccessToken, Dto.locale))
+					if (!await ProviderHelper.VerifyProfile(this._janrainProviders,
+						this._encryptionV2Key,
+						this._ivvar,
+						Dto.ConsumerId,
+						Dto.AccessToken,
+						Dto.locale))
 					{
 						apiResponse.UpdateResult(Constants.ErrorCodes.BadParameters, "access token invalid");
 						this.HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
@@ -88,7 +104,7 @@ namespace PG.ABBs.Calendar.Organizer.API.Controllers
 
 		[HttpPost]
 		[Route("TestCalendar")]
-		public IActionResult TestCalendar([FromBody] GenerateCalendarDto Dto)
+		public async Task<IActionResult> TestCalendar([FromBody] GenerateCalendarDto Dto)
 		{
 			var apiResponse = new ApiResponse();
 			try
@@ -96,7 +112,12 @@ namespace PG.ABBs.Calendar.Organizer.API.Controllers
 				if (!string.IsNullOrEmpty(Dto.AccessToken)) // to remove when all FE matches call
 				{
 					Dto.AccessToken = Uri.UnescapeDataString(Dto.AccessToken);
-					if (!this.calendarService.VerifyProfile(Dto.ConsumerId, Dto.AccessToken, Dto.locale))
+					if (!await ProviderHelper.VerifyProfile(this._janrainProviders,
+						this._encryptionV2Key,
+						this._ivvar,
+						Dto.ConsumerId,
+						Dto.AccessToken,
+						Dto.locale))
 					{
 						apiResponse.UpdateResult(Constants.ErrorCodes.BadParameters, "access token invalid");
 						this.HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
@@ -121,7 +142,7 @@ namespace PG.ABBs.Calendar.Organizer.API.Controllers
 
 		[HttpPost]
 		[Route("GetUserCalendar")]
-		public IActionResult GetUserCalendar([FromBody] GetUserCalendarDto Dto)
+		public async Task<IActionResult> GetUserCalendar([FromBody] GetUserCalendarDto Dto)
 		{
 			var apiResponse = new ApiResponse();
 			try
@@ -129,7 +150,12 @@ namespace PG.ABBs.Calendar.Organizer.API.Controllers
 				if (!string.IsNullOrEmpty(Dto.AccessToken)) // to remove when all FE matches call
 				{
 					Dto.AccessToken = Uri.UnescapeDataString(Dto.AccessToken);
-					if (!this.calendarService.VerifyProfile(Dto.ConsumerId, Dto.AccessToken, Dto.locale))
+					if (!await ProviderHelper.VerifyProfile(this._janrainProviders,
+						this._encryptionV2Key,
+						this._ivvar,
+						Dto.ConsumerId,
+						Dto.AccessToken,
+						Dto.locale))
 					{
 						apiResponse.UpdateResult(Constants.ErrorCodes.BadParameters, "access token invalid");
 						this.HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;

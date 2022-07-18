@@ -647,30 +647,6 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 			return calendar;
 		}
 
-		public bool VerifyProfile(string userId, string accessToken, string locale)
-		{
-
-			//create request
-			var apiUrl = this._CRMApi;
-			var client = new HttpClient();
-			var data = new JsonObject();
-
-			data.Add(Constant.AccessToken, accessToken);
-			data.Add(Constant.ConsumerId, userId);
-			data.Add(Constant.Locale, locale);
-
-			var content = new StringContent(data.ToString(), Encoding.UTF8, "application/json");
-
-			client.DefaultRequestHeaders.Add(Constant.OcpSubscriptionKey, this._CRMKey);
-
-			var result = client.PostAsync(apiUrl, content).Result;
-
-			if (!result.IsSuccessStatusCode)
-			{
-				return false;
-			}
-			return true;
-
-		}
+		
 	}
 }

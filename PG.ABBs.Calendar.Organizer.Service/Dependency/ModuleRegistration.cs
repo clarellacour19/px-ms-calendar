@@ -26,8 +26,9 @@ namespace PG.ABBs.Calendar.Organizer.Service.Dependency
 	using PG.ABBs.Calendar.Organizer.DependencyResolution.Registries;
 	using PG.ABBs.Calendar.Organizer.Service.Services;
 	using PG.ABBs.Calendar.Organizer.AzureStorage;
+    using PG.ABBs.Calendar.Organizer.Service.Helper;
 
-	public class ModuleRegistration : IDependency
+    public class ModuleRegistration : IDependency
 	{
 		#region Public Methods and Operators
 
@@ -36,6 +37,8 @@ namespace PG.ABBs.Calendar.Organizer.Service.Dependency
 			services.Configure<SharedMarketSettings>(configuration.GetSection(SharedMarketSettings.SectionName));
 
 			services.Configure<List<MarketSettings>>(configuration.GetSection(MarketSettings.SectionName));
+			services.Configure<List<JanrainProvider>>(configuration.GetSection(ProviderConstant.JanrainProviders));
+
 			//azure storage account
 			services.Configure<StorageModel>(configuration.GetSection(StorageModel.SectionName));
 
