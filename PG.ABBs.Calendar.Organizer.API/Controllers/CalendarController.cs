@@ -8,6 +8,7 @@ using Microsoft.Extensions.Options;
 using PG.ABBs.Calendar.Organizer.Service.Dto;
 using PG.ABBs.Calendar.Organizer.Service.Helper;
 using PG.ABBs.Calendar.Organizer.Service.Services;
+using PG.ABBs.ProviderHelper.Service;
 
 namespace PG.ABBs.Calendar.Organizer.API.Controllers
 {
@@ -70,7 +71,7 @@ namespace PG.ABBs.Calendar.Organizer.API.Controllers
 				if (!string.IsNullOrEmpty(Dto.AccessToken)) // to remove when all FE matches call
 				{
 					Dto.AccessToken = Uri.UnescapeDataString(Dto.AccessToken);
-					if (!await ProviderHelper.VerifyProfile(this._janrainProviders,
+					if (!await ProviderService.VerifyProfile(this._janrainProviders,
 						this._encryptionV2Key,
 						this._ivvar,
 						Dto.ConsumerId,
@@ -112,7 +113,7 @@ namespace PG.ABBs.Calendar.Organizer.API.Controllers
 				if (!string.IsNullOrEmpty(Dto.AccessToken)) // to remove when all FE matches call
 				{
 					Dto.AccessToken = Uri.UnescapeDataString(Dto.AccessToken);
-					if (!await ProviderHelper.VerifyProfile(this._janrainProviders,
+					if (!await ProviderService.VerifyProfile(this._janrainProviders,
 						this._encryptionV2Key,
 						this._ivvar,
 						Dto.ConsumerId,
@@ -150,7 +151,7 @@ namespace PG.ABBs.Calendar.Organizer.API.Controllers
 				if (!string.IsNullOrEmpty(Dto.AccessToken)) // to remove when all FE matches call
 				{
 					Dto.AccessToken = Uri.UnescapeDataString(Dto.AccessToken);
-					if (!await ProviderHelper.VerifyProfile(this._janrainProviders,
+					if (!await ProviderService.VerifyProfile(this._janrainProviders,
 						this._encryptionV2Key,
 						this._ivvar,
 						Dto.ConsumerId,

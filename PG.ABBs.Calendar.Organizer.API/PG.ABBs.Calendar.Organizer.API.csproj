@@ -23,6 +23,7 @@
   <ItemGroup>
     <ProjectReference Include="..\PG.ABBs.Calendar.Organizer.LogService\PG.ABBs.Calendar.Organizer.LogService.csproj" />
     <ProjectReference Include="..\PG.ABBs.Calendar.Organizer.Service\PG.ABBs.Calendar.Organizer.Service.csproj" />
+    <ProjectReference Include="..\PG.ABBs.ProviderHelper.Service\PG.ABBs.ProviderHelper.csproj" />
   </ItemGroup>
 
 </Project>
