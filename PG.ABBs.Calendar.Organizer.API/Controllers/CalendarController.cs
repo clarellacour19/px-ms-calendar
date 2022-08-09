@@ -22,22 +22,22 @@ namespace PG.ABBs.Calendar.Organizer.API.Controllers
 		private readonly ICalendarService calendarService;
 		private readonly ILogger logger;
 		private readonly TelemetryClient telemetryClient;
-		private readonly List<JanrainProvider> _janrainProviders;
 		private readonly string _encryptionV2Key;
 		private readonly string _ivvar;
+		private readonly IProviderService _providerService;
 
 		public CalendarController(ICalendarService calendarService,
 			ILogger<CalendarController> loggerProvider,
 			TelemetryClient telemetryClient, 
 			IConfiguration configuration,
-			IOptions<List<JanrainProvider>> janrainProviders)
+			IProviderService providerService)
 		{
 			this.calendarService = calendarService;
 			this.logger = loggerProvider;
 			this.telemetryClient = telemetryClient;
-			this._janrainProviders = janrainProviders.Value;
 			this._ivvar = configuration["IvVariable"];
 			this._encryptionV2Key = configuration["EncryptionV2Key"];
+			this._providerService = providerService;
 		}
 
 
@@ -71,7 +71,7 @@ namespace PG.ABBs.Calendar.Organizer.API.Controllers
 				if (!string.IsNullOrEmpty(Dto.AccessToken)) // to remove when all FE matches call
 				{
 					Dto.AccessToken = Uri.UnescapeDataString(Dto.AccessToken);
-					if (!await ProviderService.VerifyProfile(this._janrainProviders,
+					if (this._providerService.VerifyProfile(
 						this._encryptionV2Key,
 						this._ivvar,
 						Dto.ConsumerId,
@@ -113,7 +113,7 @@ namespace PG.ABBs.Calendar.Organizer.API.Controllers
 				if (!string.IsNullOrEmpty(Dto.AccessToken)) // to remove when all FE matches call
 				{
 					Dto.AccessToken = Uri.UnescapeDataString(Dto.AccessToken);
-					if (!await ProviderService.VerifyProfile(this._janrainProviders,
+					if (!_providerService.VerifyProfile(
 						this._encryptionV2Key,
 						this._ivvar,
 						Dto.ConsumerId,
@@ -151,7 +151,7 @@ namespace PG.ABBs.Calendar.Organizer.API.Controllers
 				if (!string.IsNullOrEmpty(Dto.AccessToken)) // to remove when all FE matches call
 				{
 					Dto.AccessToken = Uri.UnescapeDataString(Dto.AccessToken);
-					if (!await ProviderService.VerifyProfile(this._janrainProviders,
+					if (!_providerService.VerifyProfile(
 						this._encryptionV2Key,
 						this._ivvar,
 						Dto.ConsumerId,

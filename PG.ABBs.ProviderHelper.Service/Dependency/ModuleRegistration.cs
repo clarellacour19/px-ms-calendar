@@ -6,11 +6,14 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace PG.ABBs.Webservices.Service.Bng.Dependency
+namespace PG.ABBs.ProviderHelper
 {
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using PG.ABBs.Calendar.Organizer.DependencyResolution.Registries;
+    using PG.ABBs.Provider.Ciam.CiamProvider;
+    using PG.ABBs.Provider.Ciam.Entity;
+    using PG.ABBs.Provider.Ciam.Janrain;
     using PG.ABBs.ProviderHelper.Service;
     using System.Collections.Generic;
 
@@ -20,9 +23,16 @@ namespace PG.ABBs.Webservices.Service.Bng.Dependency
 
         public void Register(IServiceCollection services, IConfiguration configuration, bool IsDevelopment)
         {
-            services.Configure<List<JanrainProvider>>(configuration.GetSection(ProviderConstant.JanrainProviders));
+            services.Configure<CiamProviders>(configuration.GetSection("CiamProviders"));
+            services.Configure<List<CiamMarket>>(configuration.GetSection(ProviderConstant.CiamMarkets));
 
-           
+            services.AddScoped<ICiamProvider, JanrainProvider>();
+
+            
+            services.AddScoped<CiamProviderManager>();
+            services.AddScoped<IProviderService, ProviderService>();
+
+
 
         }
 

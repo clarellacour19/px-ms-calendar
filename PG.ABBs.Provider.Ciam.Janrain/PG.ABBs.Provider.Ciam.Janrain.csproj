@@ -9,8 +9,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\PG.ABBs.Calendar.Organizer.DependencyResolution\PG.ABBs.Calendar.Organizer.DependencyResolution.csproj" />
-    <ProjectReference Include="..\PG.ABBs.Provider.Ciam.Janrain\PG.ABBs.Provider.Ciam.Janrain.csproj" />
+    <ProjectReference Include="..\PG.ABBs.CalendarOrganizer.Core\PG.ABBs.CalendarOrganizer.Core.csproj" />
     <ProjectReference Include="..\PG.ABBs.Provider.Ciam\PG.ABBs.Provider.Ciam.csproj" />
   </ItemGroup>
 

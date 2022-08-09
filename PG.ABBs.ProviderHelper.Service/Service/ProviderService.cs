@@ -1,6 +1,9 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Microsoft.Extensions.Options;
+using Newtonsoft.Json.Linq;
+using PG.ABBs.Provider.Ciam.CiamProvider;
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -11,10 +14,11 @@ using System.Threading.Tasks;
 
 namespace PG.ABBs.ProviderHelper.Service
 {
-    public class JanrainProvider
+
+    public class CiamMarket
     {
         public string Locale { get; set; }
-        public string Url { get; set; }
+        public string ProviderName { get; set; }
     }
 
     public static class ProviderConstant
@@ -23,12 +27,21 @@ namespace PG.ABBs.ProviderHelper.Service
         public const string ConsumerId = "consumerID";
         public const string uuid = "uuid";
         public const string id = "id";
-        public const string JanrainProviders = "JanrainProviders";
+        public const string CiamMarkets = "CiamMarkets";
+        public const string CiamProviders = "CiamProviders";
         public const string JanrainDefaultUrl = "https://procter-gamble.eu-dev.janraincapture.com/entity";
     }
-    public static class ProviderService
+    public class ProviderService : IProviderService
     {
-        public static async Task<bool> VerifyProfile(List<JanrainProvider> janrainProviders,
+        private readonly CiamProviderManager _manager;
+
+        public ProviderService(
+           CiamProviderManager manager)
+        {
+            this._manager = manager;
+        }
+
+        public bool VerifyProfile(
             string encryptionV2Key,
             string ivvar,
             string userId,
@@ -38,29 +51,17 @@ namespace PG.ABBs.ProviderHelper.Service
             try
             {
                 //create request
-                var apiUrl = janrainProviders.FirstOrDefault(o => o.Locale == locale)?.Url ?? ProviderConstant.JanrainDefaultUrl;
-                var client = new HttpClient();
-                var data = new JsonObject();
 
                 accessToken = DecryptRequestV2(accessToken, encryptionV2Key, ivvar);
 
                 var content = new Dictionary<string, string>();
                 content.Add(ProviderConstant.AccessToken, accessToken);
 
+                var provider = this._manager.GetMarketProvider(locale);
+                var settings = this._manager.GetProviderSettings(locale);
+                var profile = provider.FetchProfile(settings.Url, content);
 
-                var request = await client.PostAsync(apiUrl, new FormUrlEncodedContent(content));
-
-                if (!request.IsSuccessStatusCode)
-                {
-                    return false;
-                }
-
-                var result = JObject.Parse(await request.Content.ReadAsStringAsync());
-                var consumerId = result["result"]?[ProviderConstant.ConsumerId]?.ToString();
-                var uuid = result["result"]?[ProviderConstant.uuid]?.ToString();
-                var id = result["result"]?[ProviderConstant.id]?.ToString();
-
-                if (userId == consumerId || userId == uuid || userId == id)
+                if (userId == profile.ConsumerId || userId == profile.Uuid || userId == profile.Id)
                 {
                     return true;
                 }
@@ -74,7 +75,7 @@ namespace PG.ABBs.ProviderHelper.Service
 
         }
 
-        public static string DecryptRequestV2(string accessToken, string keyVar, string IVVar)
+        private static string DecryptRequestV2(string accessToken, string keyVar, string IVVar)
         {
             if (!string.IsNullOrEmpty(accessToken))
             {
@@ -113,5 +114,7 @@ namespace PG.ABBs.ProviderHelper.Service
             }
             return null;
         }
+
+       
     }
 }
