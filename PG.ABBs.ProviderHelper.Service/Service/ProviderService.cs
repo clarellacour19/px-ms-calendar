@@ -4,6 +4,7 @@ using PG.ABBs.Provider.Ciam.CiamProvider;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -59,7 +60,13 @@ namespace PG.ABBs.ProviderHelper.Service
 
                 var provider = this._manager.GetMarketProvider(locale);
                 var settings = this._manager.GetProviderSettings(locale);
-                var profile = provider.FetchProfile(settings.Url, content);
+                var collection = new NameValueCollection();
+                foreach (PropertyDescriptor propertyDescriptor in TypeDescriptor.GetProperties(settings))
+                {
+                  string value = propertyDescriptor.GetValue(settings).ToString();
+                  collection.Add(propertyDescriptor.Name, value);
+                }
+                var profile = provider.FetchProfile(collection, content);
 
                 if (userId == profile.ConsumerId || userId == profile.Uuid || userId == profile.Id)
                 {

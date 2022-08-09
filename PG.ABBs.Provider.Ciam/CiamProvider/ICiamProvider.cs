@@ -1,6 +1,7 @@
 ﻿using PG.ABBs.Provider.Ciam;
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,7 +13,7 @@ namespace PG.ABBs.Provider.Ciam.CiamProvider
 
         public string Name { get; set; }
 
-        CiamBase FetchProfile(string apiUrl, Dictionary<string, string> content);
+        CiamBase FetchProfile(NameValueCollection collection, Dictionary<string, string> content);
 
     }
 }

@@ -17,8 +17,9 @@ namespace PG.ABBs.Provider.Ciam.Janrain
     {
         public string Name { get; set; } = "Janrain";
 
-        public CiamBase FetchProfile(string apiUrl, Dictionary<string, string> content)
+        public CiamBase FetchProfile(NameValueCollection collection, Dictionary<string, string> content)
         {
+            var apiUrl = collection["Url"];
             var response = PostData(apiUrl, content);
             if (!response.Success)
             {
