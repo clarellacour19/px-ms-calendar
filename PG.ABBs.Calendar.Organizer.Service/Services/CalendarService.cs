@@ -48,8 +48,6 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 
 		private readonly StorageClient storageClient;
 		private readonly TelemetryClient telemetryClient;
-		private readonly string _CRMApi;
-		private readonly string _CRMKey;
 
 		public CalendarService(
 			IUnitOfWork<DataContext> unitOfWork,
