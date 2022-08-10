@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
 using PG.ABBs.Provider.Ciam.CiamProvider;
 using System;
@@ -35,10 +36,13 @@ namespace PG.ABBs.ProviderHelper.Service
     public class ProviderService : IProviderService
     {
         private readonly CiamProviderManager _manager;
+        private readonly ILogger _logger;
 
         public ProviderService(
-           CiamProviderManager manager)
+           CiamProviderManager manager,
+           ILogger<ProviderService> loggerProvider)
         {
+            this._logger = loggerProvider;
             this._manager = manager;
         }
 
@@ -68,15 +72,16 @@ namespace PG.ABBs.ProviderHelper.Service
                 }
                 var profile = provider.FetchProfile(collection, content);
 
-                if (userId == profile.ConsumerId || userId == profile.Uuid || userId == profile.Id)
+                if (userId == profile.ConsumerId || userId == profile.Uuid)
                 {
                     return true;
                 }
                 return false;
             }
-            catch
+            catch(Exception ex)
             {
-                throw;
+                this._logger.LogError($"Error during profile authentication: {ex.Message} - {DateTime.UtcNow} - {ex.StackTrace}");
+                throw new Exception($"Error during profile authentication: {ex.Message} - {DateTime.UtcNow}");
             }
             
 

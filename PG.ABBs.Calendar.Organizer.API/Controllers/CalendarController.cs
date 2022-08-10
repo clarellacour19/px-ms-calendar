@@ -35,8 +35,8 @@ namespace PG.ABBs.Calendar.Organizer.API.Controllers
 			this.calendarService = calendarService;
 			this.logger = loggerProvider;
 			this.telemetryClient = telemetryClient;
-			this._ivvar = configuration["IvVariable"];
-			this._encryptionV2Key = configuration["EncryptionV2Key"];
+			this._ivvar = configuration[Constants.ivVariable];
+			this._encryptionV2Key = configuration[Constants.EncryptionV2Key];
 			this._providerService = providerService;
 		}
 
@@ -63,7 +63,7 @@ namespace PG.ABBs.Calendar.Organizer.API.Controllers
 
 		[HttpPost]
 		[Route("GenerateCalendar")]
-		public async Task<IActionResult> GenerateCalendar([FromBody] GenerateCalendarDto Dto)
+		public IActionResult GenerateCalendar([FromBody] GenerateCalendarDto Dto)
 		{	
 			var apiResponse = new ApiResponse();
 			try
@@ -71,7 +71,7 @@ namespace PG.ABBs.Calendar.Organizer.API.Controllers
 				if (!string.IsNullOrEmpty(Dto.AccessToken)) // to remove when all FE matches call
 				{
 					Dto.AccessToken = Uri.UnescapeDataString(Dto.AccessToken);
-					if (this._providerService.VerifyProfile(
+					if (!this._providerService.VerifyProfile(
 						this._encryptionV2Key,
 						this._ivvar,
 						Dto.ConsumerId,
@@ -113,7 +113,7 @@ namespace PG.ABBs.Calendar.Organizer.API.Controllers
 				if (!string.IsNullOrEmpty(Dto.AccessToken)) // to remove when all FE matches call
 				{
 					Dto.AccessToken = Uri.UnescapeDataString(Dto.AccessToken);
-					if (!_providerService.VerifyProfile(
+					if (!this._providerService.VerifyProfile(
 						this._encryptionV2Key,
 						this._ivvar,
 						Dto.ConsumerId,

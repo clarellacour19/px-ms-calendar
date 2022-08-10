@@ -71,8 +71,6 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 			this.telemetryClient = telemetryClient;
 			this.logger = loggerProvider;
 
-			this._CRMKey = configuration["CRM-Key"];
-			this._CRMApi = configuration["CRM"];
 		}
 
 		public async Task<List<string>> BatchUpdateCalendar(BatchUpdateCalendarDto Dto)

@@ -45,5 +45,8 @@ namespace PG.ABBs.Calendar.Organizer.API
 		public const string Audience = "JwtSettings:Audience";
 		public const string ClientSecret = "JwtSettings:ClientSecret";
 		public const string ClientID = "JwtSettings:ClientID";
+
+		public const string ivVariable = "IvVariable";
+		public const string EncryptionV2Key = "EncryptionV2Key";
 	}
 }

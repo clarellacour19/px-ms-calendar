@@ -9,7 +9,5 @@ namespace PG.ABBs.Provider.Ciam
         public string ConsumerId { get; set; }
         [JsonProperty(PropertyName = "uuid")]
         public string Uuid { get; set; }
-        [JsonProperty(PropertyName = "id")]
-        public string Id { get; set; }
     }
 }

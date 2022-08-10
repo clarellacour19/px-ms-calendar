@@ -23,7 +23,7 @@ namespace PG.ABBs.ProviderHelper
 
         public void Register(IServiceCollection services, IConfiguration configuration, bool IsDevelopment)
         {
-            services.Configure<CiamProviders>(configuration.GetSection("CiamProviders"));
+            services.Configure<CiamProviders>(configuration.GetSection(ProviderConstant.CiamProviders));
             services.Configure<List<CiamMarket>>(configuration.GetSection(ProviderConstant.CiamMarkets));
 
             services.AddScoped<ICiamProvider, JanrainProvider>();
