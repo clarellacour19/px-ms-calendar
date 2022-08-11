@@ -87,7 +87,7 @@ namespace PG.ABBs.ProviderHelper.Service
 
         }
 
-        private static string DecryptRequestV2(string accessToken, string keyVar, string IVVar)
+        private string DecryptRequestV2(string accessToken, string keyVar, string IVVar)
         {
             if (!string.IsNullOrEmpty(accessToken))
             {
@@ -117,8 +117,9 @@ namespace PG.ABBs.ProviderHelper.Service
                         return decrypted;
                     }
                 }
-                catch
+                catch(Exception ex)
                 {
+                    this._logger.LogError($"Error during key decrypting: {ex.Message} - {DateTime.UtcNow} - {ex.StackTrace}");
                     throw new Exception(message: $"access token decrypting error");
                 }
                 
