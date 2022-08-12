@@ -31,7 +31,6 @@ namespace PG.ABBs.ProviderHelper.Service
         public const string id = "id";
         public const string CiamMarkets = "CiamMarkets";
         public const string CiamProviders = "CiamProviders";
-        public const string JanrainDefaultUrl = "https://procter-gamble.eu-dev.janraincapture.com/entity";
     }
     public class ProviderService : IProviderService
     {

@@ -74,11 +74,11 @@ namespace PG.ABBs.Calendar.Organizer.API.Controllers
 					if (!this._providerService.VerifyProfile(
 						this._encryptionV2Key,
 						this._ivvar,
-						Dto.ConsumerId,
+						Dto.UserId,
 						Dto.AccessToken,
 						Dto.locale))
 					{
-						apiResponse.UpdateResult(Constants.ErrorCodes.BadParameters, "access token invalid");
+						apiResponse.UpdateResult(Constants.ErrorCodes.BadParameters, Constants.AccessTokenInvalid);
 						this.HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
 						return this.Json(apiResponse);
 					}
@@ -116,11 +116,11 @@ namespace PG.ABBs.Calendar.Organizer.API.Controllers
 					if (!this._providerService.VerifyProfile(
 						this._encryptionV2Key,
 						this._ivvar,
-						Dto.ConsumerId,
+						Dto.UserId,
 						Dto.AccessToken,
 						Dto.locale))
 					{
-						apiResponse.UpdateResult(Constants.ErrorCodes.BadParameters, "access token invalid");
+						apiResponse.UpdateResult(Constants.ErrorCodes.BadParameters, Constants.AccessTokenInvalid);
 						this.HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
 						return this.Json(apiResponse);
 					}
@@ -154,11 +154,11 @@ namespace PG.ABBs.Calendar.Organizer.API.Controllers
 					if (!_providerService.VerifyProfile(
 						this._encryptionV2Key,
 						this._ivvar,
-						Dto.ConsumerId,
+						Dto.UserId,
 						Dto.AccessToken,
 						Dto.locale))
 					{
-						apiResponse.UpdateResult(Constants.ErrorCodes.BadParameters, "access token invalid");
+						apiResponse.UpdateResult(Constants.ErrorCodes.BadParameters, Constants.AccessTokenInvalid);
 						this.HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
 						return this.Json(apiResponse);
 					}

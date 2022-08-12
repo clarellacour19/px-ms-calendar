@@ -13,6 +13,6 @@ namespace PG.ABBs.Calendar.Organizer.Service.Dto
 		public string uuidHash { get; set; }
 		public string dueDate { get; set; }
 		public string? AccessToken { get; set; }
-		public string? ConsumerId { get; set; }
+		public string? UserId { get; set; }
 	}
 }
