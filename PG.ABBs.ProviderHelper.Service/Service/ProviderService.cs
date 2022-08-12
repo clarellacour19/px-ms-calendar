@@ -52,6 +52,7 @@ namespace PG.ABBs.ProviderHelper.Service
             string accessToken,
             string locale)
         {
+            if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(accessToken)) return false;
             try
             {
                 //create request
