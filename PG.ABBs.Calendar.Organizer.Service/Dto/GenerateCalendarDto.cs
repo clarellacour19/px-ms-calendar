@@ -12,5 +12,7 @@ namespace PG.ABBs.Calendar.Organizer.Service.Dto
 		public string locale { get; set; }
 		public string uuidHash { get; set; }
 		public string dueDate { get; set; }
+		public string? AccessToken { get; set; }
+		public string? UserId { get; set; }
 	}
 }

@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 using Contentful.Core.Extensions;
 using Ical.Net;
@@ -12,6 +13,7 @@ using Ical.Net.DataTypes;
 using Microsoft.ApplicationInsights;
 using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
 using Microsoft.EntityFrameworkCore.SqlServer.Query.Internal;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.VisualBasic;
@@ -56,7 +58,8 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 			MarketSettingsHelper marketSettingsHelper,
 			TelemetryClient telemetryClient,
 			StorageClient storageClient,
-			ILogger<CalendarService> loggerProvider)
+			ILogger<CalendarService> loggerProvider,
+			IConfiguration configuration)
 		{
 			this.unitOfWork = unitOfWork;
 			this.contentManager = contentManager;
@@ -65,6 +68,7 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 			this.storageClient = storageClient;
 			this.telemetryClient = telemetryClient;
 			this.logger = loggerProvider;
+
 		}
 
 		public async Task<List<string>> BatchUpdateCalendar(BatchUpdateCalendarDto Dto)
@@ -638,5 +642,7 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 
 			return calendar;
 		}
+
+		
 	}
 }

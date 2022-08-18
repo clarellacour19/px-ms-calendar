@@ -22,6 +22,8 @@ namespace PG.ABBs.Calendar.Organizer.Data.Constant
 		public const string KeyVaultPreviewApiKey = "Contentful-PreviewApiKey";
 		public const string KeyVaultManagementApiKey = "Contentful-ManagementApiKey";
 
+		public const string OcpSubscriptionKey = "Ocp-Apim-Subscription-Key";
+
 
 		public const string DbSettings = "DatabaseSettings";
 

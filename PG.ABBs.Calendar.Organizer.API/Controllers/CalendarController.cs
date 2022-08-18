@@ -4,9 +4,11 @@ using Microsoft.ApplicationInsights.DataContracts;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using PG.ABBs.Calendar.Organizer.Service.Dto;
 using PG.ABBs.Calendar.Organizer.Service.Helper;
 using PG.ABBs.Calendar.Organizer.Service.Services;
+using PG.ABBs.ProviderHelper.Service;
 
 namespace PG.ABBs.Calendar.Organizer.API.Controllers
 {
@@ -20,12 +22,22 @@ namespace PG.ABBs.Calendar.Organizer.API.Controllers
 		private readonly ICalendarService calendarService;
 		private readonly ILogger logger;
 		private readonly TelemetryClient telemetryClient;
+		private readonly string _encryptionV2Key;
+		private readonly string _ivvar;
+		private readonly IProviderService _providerService;
 
-		public CalendarController(ICalendarService calendarService, ILogger<CalendarController> loggerProvider, TelemetryClient telemetryClient)
+		public CalendarController(ICalendarService calendarService,
+			ILogger<CalendarController> loggerProvider,
+			TelemetryClient telemetryClient, 
+			IConfiguration configuration,
+			IProviderService providerService)
 		{
 			this.calendarService = calendarService;
 			this.logger = loggerProvider;
 			this.telemetryClient = telemetryClient;
+			this._ivvar = configuration[Constants.ivVariable];
+			this._encryptionV2Key = configuration[Constants.EncryptionV2Key];
+			this._providerService = providerService;
 		}
 
 
@@ -56,6 +68,21 @@ namespace PG.ABBs.Calendar.Organizer.API.Controllers
 			var apiResponse = new ApiResponse();
 			try
 			{
+				if (!string.IsNullOrEmpty(Dto.AccessToken)) // to remove when all FE matches call
+				{
+					Dto.AccessToken = Uri.UnescapeDataString(Dto.AccessToken);
+					if (!this._providerService.VerifyProfile(
+						this._encryptionV2Key,
+						this._ivvar,
+						Dto.UserId,
+						Dto.AccessToken,
+						Dto.locale))
+					{
+						apiResponse.UpdateResult(Constants.ErrorCodes.BadParameters, Constants.AccessTokenInvalid);
+						this.HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
+						return this.Json(apiResponse);
+					}
+				}
 				var stopwatch = new Stopwatch();
 				stopwatch.Start();
 				var apiName = "GenerateCalendar";
@@ -78,11 +105,26 @@ namespace PG.ABBs.Calendar.Organizer.API.Controllers
 
 		[HttpPost]
 		[Route("TestCalendar")]
-		public IActionResult TestCalendar([FromBody] GenerateCalendarDto Dto)
+		public async Task<IActionResult> TestCalendar([FromBody] GenerateCalendarDto Dto)
 		{
 			var apiResponse = new ApiResponse();
 			try
 			{
+				if (!string.IsNullOrEmpty(Dto.AccessToken)) // to remove when all FE matches call
+				{
+					Dto.AccessToken = Uri.UnescapeDataString(Dto.AccessToken);
+					if (!this._providerService.VerifyProfile(
+						this._encryptionV2Key,
+						this._ivvar,
+						Dto.UserId,
+						Dto.AccessToken,
+						Dto.locale))
+					{
+						apiResponse.UpdateResult(Constants.ErrorCodes.BadParameters, Constants.AccessTokenInvalid);
+						this.HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
+						return this.Json(apiResponse);
+					}
+				}
 				var apiName = "TestCalendar";
 				var message = $"Generate Method Step 1 at {DateTime.UtcNow.ToString()}";
 				ApplicationInsightsHelper.SendCustomLog(this.telemetryClient, message, apiName, apiName, apiName);
@@ -101,11 +143,26 @@ namespace PG.ABBs.Calendar.Organizer.API.Controllers
 
 		[HttpPost]
 		[Route("GetUserCalendar")]
-		public IActionResult GetUserCalendar([FromBody] GetUserCalendarDto Dto)
+		public async Task<IActionResult> GetUserCalendar([FromBody] GetUserCalendarDto Dto)
 		{
 			var apiResponse = new ApiResponse();
 			try
 			{
+				if (!string.IsNullOrEmpty(Dto.AccessToken)) // to remove when all FE matches call
+				{
+					Dto.AccessToken = Uri.UnescapeDataString(Dto.AccessToken);
+					if (!_providerService.VerifyProfile(
+						this._encryptionV2Key,
+						this._ivvar,
+						Dto.UserId,
+						Dto.AccessToken,
+						Dto.locale))
+					{
+						apiResponse.UpdateResult(Constants.ErrorCodes.BadParameters, Constants.AccessTokenInvalid);
+						this.HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
+						return this.Json(apiResponse);
+					}
+				}
 				var stopwatch = new Stopwatch();
 				stopwatch.Start();
 				var apiName = "GetUserCalendar";

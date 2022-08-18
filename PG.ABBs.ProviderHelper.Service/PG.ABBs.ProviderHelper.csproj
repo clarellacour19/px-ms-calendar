@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\PG.ABBs.Calendar.Organizer.DependencyResolution\PG.ABBs.Calendar.Organizer.DependencyResolution.csproj" />
+    <ProjectReference Include="..\PG.ABBs.Provider.Ciam.Janrain\PG.ABBs.Provider.Ciam.Janrain.csproj" />
+    <ProjectReference Include="..\PG.ABBs.Provider.Ciam\PG.ABBs.Provider.Ciam.csproj" />
+  </ItemGroup>
+
+</Project>
