@@ -2,6 +2,8 @@ using System.Diagnostics;
 using System.Reflection;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
+using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.Identity.Client;
 using Microsoft.OpenApi.Models;
 using PG.ABBs.Calendar.Organizer.API;
@@ -51,19 +53,24 @@ services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 		options.Authority = _authority;
 		options.Audience = _audience;
 	});
-services.AddSwaggerGen(
-	options =>
-	{
-		options.SwaggerDoc(
-			"v1",
-			new OpenApiInfo
-			{
-				Title = "Microservice - Calendar Organizer Web HTTP API",
-				Version = "v1",
-				Description =
-					"The Calendar Organizer Microservice HTTP API. This is all microservice API endpoints"
-			});
-	});
+//Api Versioning
+
+// Updating the middlewear to use versioning.
+services.AddApiVersioning(setup =>
+{
+	setup.DefaultApiVersion = new Microsoft.AspNetCore.Mvc.ApiVersion(1, 0);
+	setup.AssumeDefaultVersionWhenUnspecified = true;
+	setup.ReportApiVersions = true;
+	setup.ApiVersionReader = new UrlSegmentApiVersionReader();
+
+});
+services.AddVersionedApiExplorer(setup =>
+{
+	setup.GroupNameFormat = "'v'VVV";
+	setup.SubstituteApiVersionInUrl = true;
+});
+
+services.AddSwaggerGen();
 
 services.AddCors(
 	o => o.AddPolicy(
@@ -84,7 +91,19 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
 	Trace.TraceInformation($"Using {app.Environment.EnvironmentName} Environment");
-	app.UseSwagger().UseSwaggerUI(c => { c.SwaggerEndpoint($"/swagger/v1/swagger.json", "Calendar Organizer WebAPI V1"); });
+
+	var versionProvider = app.Services.GetService<IApiVersionDescriptionProvider>();
+
+	app.UseSwagger();
+	app.UseSwaggerUI(options =>
+	{
+		//options.SwaggerEndpoint("/swagger/v1/swagger.json", "V1");
+		foreach (var description in versionProvider.ApiVersionDescriptions)
+		{
+			options.SwaggerEndpoint($"/swagger/{description.GroupName}/swagger.json", description.GroupName.ToUpperInvariant());
+		}
+	});
+
 
 	app.UseDeveloperExceptionPage();
 }

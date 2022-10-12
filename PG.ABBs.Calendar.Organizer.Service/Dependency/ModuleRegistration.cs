@@ -26,6 +26,7 @@ namespace PG.ABBs.Calendar.Organizer.Service.Dependency
 	using PG.ABBs.Calendar.Organizer.DependencyResolution.Registries;
 	using PG.ABBs.Calendar.Organizer.Service.Services;
 	using PG.ABBs.Calendar.Organizer.AzureStorage;
+	using PG.ABBs.Calendar.Organizer.Service.Swagger;
 
     public class ModuleRegistration : IDependency
 	{
@@ -92,6 +93,7 @@ namespace PG.ABBs.Calendar.Organizer.Service.Dependency
 			services.AddTransient<ContentManager>();
 			services.AddSingleton<MarketSettingsHelper>();
 			services.AddTransient<StorageClient>();
+			services.ConfigureOptions<ConfigureSwaggerOptions>();
 		}
 
 		#endregion
