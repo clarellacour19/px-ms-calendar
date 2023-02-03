@@ -182,5 +182,20 @@ namespace PG.ABBs.Calendar.Organizer.API.Controllers
 
 			return this.Json(apiResponse);
 		}
+
+		[HttpGet("DownloadCalendar/{market}/{hash}")]
+		public async Task<IActionResult> DownloadCalendar(string market, string hash)
+		{
+			var path = $"{market}/{hash}";
+			//var stream = new MemoryStream();
+			var stream =	await  calendarService.DownloadCalendar(path);
+
+			if (stream.Equals(null))
+			{
+				return NotFound();
+			}
+			
+			return File(stream, "application/octet-stream", hash);
+		}
 	}
 }

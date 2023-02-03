@@ -643,6 +643,17 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 			return calendar;
 		}
 
-		
+		public async Task<byte[]> DownloadCalendar(string path)
+		{
+			if (!path.Equals(null))
+			{
+				//var mem = new MemoryStream();
+				var mem =await storageClient.DownloadCalendar(path);
+				return mem;
+			}
+
+			throw new System.Exception("undefined path");
+
+		}
 	}
 }

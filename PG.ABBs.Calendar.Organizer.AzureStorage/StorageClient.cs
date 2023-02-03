@@ -118,6 +118,34 @@ namespace PG.ABBs.Calendar.Organizer.AzureStorage
 			}
 		}
 
+		public async Task<byte[]> DownloadCalendar(string path)
+		{
+			try
+			{
+				BlobClient blob = container.GetBlobClient(Path.Combine($"{azureStorage.Value.EnvironmentName}/{path}"));//"{market}/{calendar.Name}.ics"
+				if (!await blob.ExistsAsync())
+				{
+					throw new Exception("File not found");
+				}
+
+				using var stream = new MemoryStream();
+
+				await blob.DownloadToAsync(stream);
+
+				
+
+				return stream.ToArray();
+			}
+			catch (Exception e)
+			{
+					Console.WriteLine();
+					throw new Exception(e.ToString());
+			}
+
+
+
+		}
+
 		public async Task DeleteCalendarAsync(string market, List<string> listOfCals)
 		{
 			try

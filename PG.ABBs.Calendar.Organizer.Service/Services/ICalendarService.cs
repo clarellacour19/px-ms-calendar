@@ -1,4 +1,5 @@
 ﻿using PG.ABBs.Calendar.Organizer.Service.Dto;
+using System;
 
 namespace PG.ABBs.Calendar.Organizer.Service.Services
 {
@@ -9,6 +10,8 @@ namespace PG.ABBs.Calendar.Organizer.Service.Services
 		ReturnGetUserCalendarDto GetUserCalendar(GetUserCalendarDto Dto);
 
 		CalendarDto GenerateCalendar(GenerateCalendarDto Dto);
+
+		Task<byte[]> DownloadCalendar(string path);
 
 	}
 }
