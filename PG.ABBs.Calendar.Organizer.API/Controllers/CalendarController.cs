@@ -68,20 +68,17 @@ namespace PG.ABBs.Calendar.Organizer.API.Controllers
 			var apiResponse = new ApiResponse();
 			try
 			{
-				if (!string.IsNullOrEmpty(Dto.AccessToken)) // to remove when all FE matches call
+				Dto.AccessToken = Uri.UnescapeDataString(Dto.AccessToken);
+				if (!this._providerService.VerifyProfile(
+					this._encryptionV2Key,
+					this._ivvar,
+					Dto.UserId,
+					Dto.AccessToken,
+					Dto.locale))
 				{
-					Dto.AccessToken = Uri.UnescapeDataString(Dto.AccessToken);
-					if (!this._providerService.VerifyProfile(
-						this._encryptionV2Key,
-						this._ivvar,
-						Dto.UserId,
-						Dto.AccessToken,
-						Dto.locale))
-					{
-						apiResponse.UpdateResult(Constants.ErrorCodes.BadParameters, Constants.AccessTokenInvalid);
-						this.HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
-						return this.Json(apiResponse);
-					}
+					apiResponse.UpdateResult(Constants.ErrorCodes.BadParameters, Constants.AccessTokenInvalid);
+					this.HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
+					return this.Json(apiResponse);
 				}
 				var stopwatch = new Stopwatch();
 				stopwatch.Start();
@@ -110,20 +107,17 @@ namespace PG.ABBs.Calendar.Organizer.API.Controllers
 			var apiResponse = new ApiResponse();
 			try
 			{
-				if (!string.IsNullOrEmpty(Dto.AccessToken)) // to remove when all FE matches call
+				Dto.AccessToken = Uri.UnescapeDataString(Dto.AccessToken);
+				if (!this._providerService.VerifyProfile(
+					this._encryptionV2Key,
+					this._ivvar,
+					Dto.UserId,
+					Dto.AccessToken,
+					Dto.locale))
 				{
-					Dto.AccessToken = Uri.UnescapeDataString(Dto.AccessToken);
-					if (!this._providerService.VerifyProfile(
-						this._encryptionV2Key,
-						this._ivvar,
-						Dto.UserId,
-						Dto.AccessToken,
-						Dto.locale))
-					{
-						apiResponse.UpdateResult(Constants.ErrorCodes.BadParameters, Constants.AccessTokenInvalid);
-						this.HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
-						return this.Json(apiResponse);
-					}
+					apiResponse.UpdateResult(Constants.ErrorCodes.BadParameters, Constants.AccessTokenInvalid);
+					this.HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
+					return this.Json(apiResponse);
 				}
 				var apiName = "TestCalendar";
 				var message = $"Generate Method Step 1 at {DateTime.UtcNow.ToString()}";
@@ -148,20 +142,17 @@ namespace PG.ABBs.Calendar.Organizer.API.Controllers
 			var apiResponse = new ApiResponse();
 			try
 			{
-				if (!string.IsNullOrEmpty(Dto.AccessToken)) // to remove when all FE matches call
+				Dto.AccessToken = Uri.UnescapeDataString(Dto.AccessToken);
+				if (!_providerService.VerifyProfile(
+					this._encryptionV2Key,
+					this._ivvar,
+					Dto.UserId,
+					Dto.AccessToken,
+					Dto.locale))
 				{
-					Dto.AccessToken = Uri.UnescapeDataString(Dto.AccessToken);
-					if (!_providerService.VerifyProfile(
-						this._encryptionV2Key,
-						this._ivvar,
-						Dto.UserId,
-						Dto.AccessToken,
-						Dto.locale))
-					{
-						apiResponse.UpdateResult(Constants.ErrorCodes.BadParameters, Constants.AccessTokenInvalid);
-						this.HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
-						return this.Json(apiResponse);
-					}
+					apiResponse.UpdateResult(Constants.ErrorCodes.BadParameters, Constants.AccessTokenInvalid);
+					this.HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
+					return this.Json(apiResponse);
 				}
 				var stopwatch = new Stopwatch();
 				stopwatch.Start();
