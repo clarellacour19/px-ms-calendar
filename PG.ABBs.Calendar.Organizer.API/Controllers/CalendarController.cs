@@ -66,6 +66,12 @@ namespace PG.ABBs.Calendar.Organizer.API.Controllers
 		public IActionResult GenerateCalendar([FromBody] GenerateCalendarDto Dto)
 		{	
 			var apiResponse = new ApiResponse();
+			var DtoValidation = Dto.ValidateObject();
+			if (DtoValidation.Result.Equals("BadParameters"))
+			{
+				HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
+				return Json(DtoValidation);
+			}
 			try
 			{
 				Dto.AccessToken = Uri.UnescapeDataString(Dto.AccessToken);
@@ -105,6 +111,12 @@ namespace PG.ABBs.Calendar.Organizer.API.Controllers
 		public async Task<IActionResult> TestCalendar([FromBody] GenerateCalendarDto Dto)
 		{
 			var apiResponse = new ApiResponse();
+			var DtoValidation = Dto.ValidateObject();
+			if (DtoValidation.Result.Equals("BadParameters"))
+			{
+				HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
+				return Json(DtoValidation);
+			}
 			try
 			{
 				Dto.AccessToken = Uri.UnescapeDataString(Dto.AccessToken);
@@ -140,6 +152,12 @@ namespace PG.ABBs.Calendar.Organizer.API.Controllers
 		public async Task<IActionResult> GetUserCalendar([FromBody] GetUserCalendarDto Dto)
 		{
 			var apiResponse = new ApiResponse();
+			var DtoValidation = Dto.ValidateObject();
+			if (DtoValidation.Result.Equals("BadParameters"))
+			{
+				HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
+				return Json(DtoValidation);
+			}
 			try
 			{
 				Dto.AccessToken = Uri.UnescapeDataString(Dto.AccessToken);

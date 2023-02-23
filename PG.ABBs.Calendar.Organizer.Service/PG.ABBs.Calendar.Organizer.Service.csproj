@@ -19,6 +19,7 @@
     <ProjectReference Include="..\PG.ABBs.Calendar.Organizer.Content\PG.ABBs.Calendar.Organizer.Content.csproj" />
     <ProjectReference Include="..\PG.ABBs.Calendar.Organizer.Data\PG.ABBs.Calendar.Organizer.Data.csproj" />
     <ProjectReference Include="..\PG.ABBs.Calendar.Organizer.DependencyResolution\PG.ABBs.Calendar.Organizer.DependencyResolution.csproj" />
+    <ProjectReference Include="..\PG.ABBs.CalendarOrganizer.Core\PG.ABBs.CalendarOrganizer.Core.csproj" />
 
   </ItemGroup>
 </Project>
