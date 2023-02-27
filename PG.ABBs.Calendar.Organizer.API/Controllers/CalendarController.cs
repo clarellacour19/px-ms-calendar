@@ -67,7 +67,7 @@ namespace PG.ABBs.Calendar.Organizer.API.Controllers
 		{	
 			var apiResponse = new ApiResponse();
 			var DtoValidation = Dto.ValidateObject();
-			if (DtoValidation.Result.Equals("BadParameters"))
+			if (DtoValidation.Result.Equals(Constants.ErrorCodes.BadParameters))
 			{
 				HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
 				return Json(DtoValidation);
@@ -112,7 +112,7 @@ namespace PG.ABBs.Calendar.Organizer.API.Controllers
 		{
 			var apiResponse = new ApiResponse();
 			var DtoValidation = Dto.ValidateObject();
-			if (DtoValidation.Result.Equals("BadParameters"))
+			if (DtoValidation.Result.Equals(Constants.ErrorCodes.BadParameters))
 			{
 				HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
 				return Json(DtoValidation);
@@ -153,7 +153,7 @@ namespace PG.ABBs.Calendar.Organizer.API.Controllers
 		{
 			var apiResponse = new ApiResponse();
 			var DtoValidation = Dto.ValidateObject();
-			if (DtoValidation.Result.Equals("BadParameters"))
+			if (DtoValidation.Result.Equals(Constants.ErrorCodes.BadParameters))
 			{
 				HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
 				return Json(DtoValidation);

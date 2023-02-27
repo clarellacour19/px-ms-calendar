@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using static PG.ABBs.CalendarOrganizer.Core.Constants.Constants;
 
 namespace PG.ABBs.CalendarOrganizer.Core.DTO
 {
@@ -16,14 +17,14 @@ namespace PG.ABBs.CalendarOrganizer.Core.DTO
         public ValidationResponse GetFailedResponse()
         {
             ValidationResponse result = new ValidationResponse();
-            result.Result = "BadParameters";
+            result.Result = ErrorCodes.BadParameters;
             return result;
         }
 
         public ValidationResponse GetOkResponse()
         {
             ValidationResponse result = new ValidationResponse();
-            result.Result = "OK";
+            result.Result = ErrorCodes.BadParameters;
             return result;
         }
     }
