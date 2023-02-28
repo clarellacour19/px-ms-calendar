@@ -24,7 +24,7 @@ namespace PG.ABBs.CalendarOrganizer.Core.DTO
         public ValidationResponse GetOkResponse()
         {
             ValidationResponse result = new ValidationResponse();
-            result.Result = ErrorCodes.BadParameters;
+            result.Result = ErrorCodes.Ok;
             return result;
         }
     }
