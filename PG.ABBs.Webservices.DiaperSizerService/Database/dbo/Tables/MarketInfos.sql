@@ -1,7 +1,0 @@
-﻿CREATE TABLE [dbo].[MarketInfos]
-(
-	[MarketInfoID] UNIQUEIDENTIFIER NOT NULL PRIMARY KEY DEFAULT newid(), 
-    [Country] NVARCHAR(3) NOT NULL, 
-    [Locale] NVARCHAR(6) NOT NULL, 
-    [Unit] NVARCHAR(10) NOT NULL
-)
