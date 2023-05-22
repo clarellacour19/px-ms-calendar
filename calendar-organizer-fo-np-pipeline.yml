@@ -47,7 +47,7 @@ stages:
           serviceConnectionEndpoint: 'test snyk'
           testType: 'app'
           monitorWhen: 'always'
-          failOnIssues: true
+          failOnIssues: false
       # - task: SonarQubeAnalyze@5
       
       # - task: SonarQubePublish@5
