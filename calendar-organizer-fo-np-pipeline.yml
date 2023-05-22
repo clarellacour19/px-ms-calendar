@@ -23,32 +23,40 @@ stages:
       steps:
       - powershell: '$env:CI="true"'
         displayName: 'Set Environment Variables'
-      - task: Docker@2
-        displayName: Login to ACR
-        inputs:
-          containerRegistry: 'mbnpmicroservicesregistry'
-          command: 'login'
+      # - task: Docker@2
+      #   displayName: Login to ACR
+      #   inputs:
+      #     containerRegistry: 'mbnpmicroservicesregistry'
+      #     command: 'login'
 
-      - task: SonarQubePrepare@5
-        inputs:
-          SonarQube: 'PX-SonarQube-ServiceConnection'
-          scannerMode: 'MSBuild'
-          projectKey: 'PX-Pampers-Microservices'
+      # - task: SonarQubePrepare@5
+      #   inputs:
+      #     SonarQube: 'PX-SonarQube-ServiceConnection'
+      #     scannerMode: 'MSBuild'
+      #     projectKey: 'PX-Pampers-Microservices'
+
       - task: UseDotNet@2
         inputs:
           version: 6.0.x
           includePreviewVersions: true
       - script: dotnet build --configuration release
         displayName: 'Build .NET 6 Application'
-      - task: SonarQubeAnalyze@5
       
-      - task: SonarQubePublish@5
+      - task: SnykSecurityScan@1
         inputs:
-          pollingTimeoutSec: '300'
+          serviceConnectionEndpoint: 'test snyk'
+          testType: 'app'
+          monitorWhen: 'always'
+          failOnIssues: true
+      # - task: SonarQubeAnalyze@5
+      
+      # - task: SonarQubePublish@5
+      #   inputs:
+      #     pollingTimeoutSec: '300'
 
-      - task: sonar-buildbreaker@8
-        inputs:
-          SonarQube: 'PX-SonarQube-ServiceConnection'
+      # - task: sonar-buildbreaker@8
+      #   inputs:
+      #     SonarQube: 'PX-SonarQube-ServiceConnection'
 
       # - task: PowerShell@2
       #   displayName: Set sonarqube branch
@@ -65,42 +73,42 @@ stages:
       #       Write-Host("Sonar branch: $updatedSonarBranch")
       #       $dockerFile = $dockerFile -replace $sonarBranchPattern, $updatedSonarBranch
       #       $dockerFile | Set-Content -Path .\Dockerfile
-      - task: Docker@2
-        displayName: Docker Build and Push
-        inputs:
-          containerRegistry: 'mbnpmicroservicesregistry'
-          repository: 'calendarorganizer'
-          command: 'buildAndPush'
-          Dockerfile: 'Dockerfile'
-          tags: '$(Build.BuildNumber)'
+      # - task: Docker@2
+      #   displayName: Docker Build and Push
+      #   inputs:
+      #     containerRegistry: 'mbnpmicroservicesregistry'
+      #     repository: 'calendarorganizer'
+      #     command: 'buildAndPush'
+      #     Dockerfile: 'Dockerfile'
+      #     tags: '$(Build.BuildNumber)'
       
-      - task: Docker@2
-        displayName: Docker Build
-        inputs:
-          containerRegistry: 'mbnpmicroservicesregistry'
-          repository: 'calendarorganizer'
-          command: 'build'
-          Dockerfile: 'Dockerfile'
-          tags: '$(Build.BuildNumber)'
+      # - task: Docker@2
+      #   displayName: Docker Build
+      #   inputs:
+      #     containerRegistry: 'mbnpmicroservicesregistry'
+      #     repository: 'calendarorganizer'
+      #     command: 'build'
+      #     Dockerfile: 'Dockerfile'
+      #     tags: '$(Build.BuildNumber)'
 
-      - task: Docker@2
-        displayName: Docker Push
-        inputs:
-          containerRegistry: 'mbnpmicroservicesregistry'
-          repository: 'calendarorganizer'
-          command: 'push'
-          tags: '$(Build.BuildNumber)'
+      # - task: Docker@2
+      #   displayName: Docker Push
+      #   inputs:
+      #     containerRegistry: 'mbnpmicroservicesregistry'
+      #     repository: 'calendarorganizer'
+      #     command: 'push'
+      #     tags: '$(Build.BuildNumber)'
 
-      - task: CmdLine@2
-        displayName: Docker Pull from ACR
-        inputs:
-          script: 'docker pull mbnpmicroservicesregistry.azurecr.io/calendarorganizer:$(Build.BuildNumber)'
+      # - task: CmdLine@2
+      #   displayName: Docker Pull from ACR
+      #   inputs:
+      #     script: 'docker pull mbnpmicroservicesregistry.azurecr.io/calendarorganizer:$(Build.BuildNumber)'
 
-      - task: Docker@2
-        displayName: Logout of ACR
-        inputs:
-          containerRegistry: 'mbnpmicroservicesregistry'
-          command: 'logout'
+      # - task: Docker@2
+      #   displayName: Logout of ACR
+      #   inputs:
+      #     containerRegistry: 'mbnpmicroservicesregistry'
+      #     command: 'logout'
 
       # - task: CmdLine@2
       #   displayName: Tag JFrog Image
@@ -156,39 +164,39 @@ stages:
       #     allowFailBuild: false
 
 
-  - stage: Deploy
-    jobs:
-    - job: Deploy
-      pool:
-        name: Azure Pipelines
-        vmImage: 'ubuntu-latest'
-      steps:
-      - powershell: '$env:CI="true"'
-        displayName: 'Set Environment Variables'
-      - task: AzureWebAppContainer@1
-        displayName: 'Deploy to slot'
-        inputs:
-          azureSubscription: 'AZ-RG-CS-PX-MB-Services-PaaS-NA-NonProd-01'
-          appName: 'px-calendar-nonprod'
-          deployToSlotOrASE: true
-          resourceGroupName: AZ-RG-CS-PX-MB-Services-PaaS-NA-NonProd-01
-          containers: 'mbnpmicroservicesregistry.azurecr.io/calendarorganizer:$(Build.BuildNumber)'
+  # - stage: Deploy
+  #   jobs:
+  #   - job: Deploy
+  #     pool:
+  #       name: Azure Pipelines
+  #       vmImage: 'ubuntu-latest'
+  #     steps:
+  #     - powershell: '$env:CI="true"'
+  #       displayName: 'Set Environment Variables'
+  #     - task: AzureWebAppContainer@1
+  #       displayName: 'Deploy to slot'
+  #       inputs:
+  #         azureSubscription: 'AZ-RG-CS-PX-MB-Services-PaaS-NA-NonProd-01'
+  #         appName: 'px-calendar-nonprod'
+  #         deployToSlotOrASE: true
+  #         resourceGroupName: AZ-RG-CS-PX-MB-Services-PaaS-NA-NonProd-01
+  #         containers: 'mbnpmicroservicesregistry.azurecr.io/calendarorganizer:$(Build.BuildNumber)'
 
-  - stage: Test
-    jobs:
-    - job: Test
-      pool:
-        name: Azure Pipelines
-        vmImage: 'ubuntu-latest'
-      steps:
-      - script: 'sudo npm install newman --global'
-        workingDirectory: '$(System.DefaultWorkingDirectory)'
-        displayName: 'Install newman'
-      - script: 'newman run MB_Microservice.postman_collection.json -e MB_Microservice_Stage.postman_environment.json --reporters cli,junit --reporter-junit-export Results/jUnitReport.xml'
-        workingDirectory: '$(System.DefaultWorkingDirectory)/_px-newman/QA'
-        displayName: 'Run API Test'
-        continueOnError: true
-      - task: PublishTestResults@2
-        displayName: 'Publish Test Results'
-        inputs:
-          testResultsFiles: '**/jUnitReport*.xml'
+  # - stage: Test
+  #   jobs:
+  #   - job: Test
+  #     pool:
+  #       name: Azure Pipelines
+  #       vmImage: 'ubuntu-latest'
+  #     steps:
+  #     - script: 'sudo npm install newman --global'
+  #       workingDirectory: '$(System.DefaultWorkingDirectory)'
+  #       displayName: 'Install newman'
+  #     - script: 'newman run MB_Microservice.postman_collection.json -e MB_Microservice_Stage.postman_environment.json --reporters cli,junit --reporter-junit-export Results/jUnitReport.xml'
+  #       workingDirectory: '$(System.DefaultWorkingDirectory)/_px-newman/QA'
+  #       displayName: 'Run API Test'
+  #       continueOnError: true
+  #     - task: PublishTestResults@2
+  #       displayName: 'Publish Test Results'
+  #       inputs:
+  #         testResultsFiles: '**/jUnitReport*.xml'
