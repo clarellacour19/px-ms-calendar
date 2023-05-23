@@ -28,21 +28,43 @@ stages:
         inputs:
           containerRegistry: 'mbnpmicroservicesregistry'
           command: 'login'
-      - task: PowerShell@2
-        displayName: Set sonarqube branch
-        condition: eq('${{ parameters.SonarQube }}', 'true')
+
+      - task: SonarQubePrepare@5
         inputs:
-          targetType: 'inline'
-          script: |
-            $branch = "$(Build.SourceBranch)"
-            $branchName = $branch.Substring($branch.IndexOf("/",$branch.IndexOf("/")+1)+1)
-            $dockerFile = Get-Content -Path .\Dockerfile
-            $sonarBranchPattern = "/d:sonar.branch.name=.*"
-            $sonarBranchName = $dockerFile | Select-String -Pattern $sonarBranchPattern
-            $updatedSonarBranch = $sonarBranchName.Matches.Value -replace "`"$", "-$branchName-NonProd`""
-            Write-Host("Sonar branch: $updatedSonarBranch")
-            $dockerFile = $dockerFile -replace $sonarBranchPattern, $updatedSonarBranch
-            $dockerFile | Set-Content -Path .\Dockerfile
+          SonarQube: 'PX-SonarQube-ServiceConnection'
+          scannerMode: 'MSBuild'
+          projectKey: 'PX-Pampers-Microservices'
+      - task: UseDotNet@2
+        inputs:
+          version: 6.0.x
+          includePreviewVersions: true
+      - script: dotnet build --configuration release
+        displayName: 'Build .NET 6 Application'
+      - task: SonarQubeAnalyze@5
+      
+      - task: SonarQubePublish@5
+        inputs:
+          pollingTimeoutSec: '300'
+
+      - task: sonar-buildbreaker@8
+        inputs:
+          SonarQube: 'PX-SonarQube-ServiceConnection'
+
+      # - task: PowerShell@2
+      #   displayName: Set sonarqube branch
+      #   condition: eq('${{ parameters.SonarQube }}', 'true')
+      #   inputs:
+      #     targetType: 'inline'
+      #     script: |
+      #       $branch = "$(Build.SourceBranch)"
+      #       $branchName = $branch.Substring($branch.IndexOf("/",$branch.IndexOf("/")+1)+1)
+      #       $dockerFile = Get-Content -Path .\Dockerfile
+      #       $sonarBranchPattern = "/d:sonar.branch.name=.*"
+      #       $sonarBranchName = $dockerFile | Select-String -Pattern $sonarBranchPattern
+      #       $updatedSonarBranch = $sonarBranchName.Matches.Value -replace "`"$", "-$branchName-NonProd`""
+      #       Write-Host("Sonar branch: $updatedSonarBranch")
+      #       $dockerFile = $dockerFile -replace $sonarBranchPattern, $updatedSonarBranch
+      #       $dockerFile | Set-Content -Path .\Dockerfile
       - task: Docker@2
         displayName: Docker Build and Push
         inputs:
@@ -52,46 +74,46 @@ stages:
           Dockerfile: 'Dockerfile'
           tags: '$(Build.BuildNumber)'
       
-      # - task: Docker@2
-      #   displayName: Docker Build
-      #   inputs:
-      #     containerRegistry: 'mbnpmicroservicesregistry'
-      #     repository: 'calendarorganizer'
-      #     command: 'build'
-      #     Dockerfile: 'Dockerfile'
-      #     tags: '$(Build.BuildNumber)'
+      - task: Docker@2
+        displayName: Docker Build
+        inputs:
+          containerRegistry: 'mbnpmicroservicesregistry'
+          repository: 'calendarorganizer'
+          command: 'build'
+          Dockerfile: 'Dockerfile'
+          tags: '$(Build.BuildNumber)'
 
-      # - task: Docker@2
-      #   displayName: Docker Push
-      #   inputs:
-      #     containerRegistry: 'mbnpmicroservicesregistry'
-      #     repository: 'calendarorganizer'
-      #     command: 'push'
-      #     tags: '$(Build.BuildNumber)'
+      - task: Docker@2
+        displayName: Docker Push
+        inputs:
+          containerRegistry: 'mbnpmicroservicesregistry'
+          repository: 'calendarorganizer'
+          command: 'push'
+          tags: '$(Build.BuildNumber)'
 
-      # - task: CmdLine@2
-      #   displayName: Docker Pull from ACR
-      #   inputs:
-      #     script: 'docker pull mbnpmicroservicesregistry.azurecr.io/calendarorganizer:$(Build.BuildNumber)'
+      - task: CmdLine@2
+        displayName: Docker Pull from ACR
+        inputs:
+          script: 'docker pull mbnpmicroservicesregistry.azurecr.io/calendarorganizer:$(Build.BuildNumber)'
 
-      # - task: Docker@2
-      #   displayName: Logout of ACR
-      #   inputs:
-      #     containerRegistry: 'mbnpmicroservicesregistry'
-      #     command: 'logout'
+      - task: Docker@2
+        displayName: Logout of ACR
+        inputs:
+          containerRegistry: 'mbnpmicroservicesregistry'
+          command: 'logout'
 
       # - task: CmdLine@2
       #   displayName: Tag JFrog Image
       #   inputs:
-      #     script: 'docker tag mbnpmicroservicesregistry.azurecr.io/calendarorganizer:$(Build.BuildNumber) png.jfrog.io/pamper-calendarorganizer-virtual/calendarorganizer:$(Build.BuildNumber)'
+      #     script: 'docker tag mbnpmicroservicesregistry.azurecr.io/calendarorganizer:$(Build.BuildNumber) png.jfrog.io/pamper-calendarorganizervirtual/calendarorganizer:$(Build.BuildNumber)'
 
       # - task: ArtifactoryDocker@1 
       #   displayName: Push to JFrog
       #   inputs:
       #     command: 'push'
       #     artifactoryService: 'PX-JFrog-Artifactory-ServiceConnection'
-      #     targetRepo: 'pamper-calendarorganizer-virtual'
-      #     imageName: 'png.jfrog.io/pamper-calendarorganizer-virtual/calendarorganizer:$(Build.BuildNumber)'
+      #     targetRepo: 'pamper-calendarorganizervirtual'
+      #     imageName: 'png.jfrog.io/pamper-calendarorganizervirtual/calendarorganizer:$(Build.BuildNumber)'
       #     collectBuildInfo: true
       #     buildName: '$(Build.DefinitionName)'
       #     buildNumber: '$(Build.BuildNumber)'
